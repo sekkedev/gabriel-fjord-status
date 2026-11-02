@@ -1,0 +1,12 @@
+# Static-assets-only Worker: serves the page built by scripts/build.py (dist/)
+# at gabriel.sekke.dev. Deploy with `npx wrangler deploy` after `python scripts/build.py`.
+name = "gabriel-fjord"
+compatibility_date = "2026-10-01"
+workers_dev = false
+
+[assets]
+directory = "./dist"
+
+[[routes]]
+pattern = "gabriel.sekke.dev"
+custom_domain = true

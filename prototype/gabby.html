@@ -1,0 +1,945 @@
+<title>Gabby – demo</title>
+<link rel="icon" type="image/webp" href="__ASSET_icon-oxygen__">
+<style>
+/*__BASE_CSS__*/
+
+/* Gabby: a labelled demo of the organisers' "daily post" idea, laid out like a photo-sharing app's mobile profile.
+   No Instagram name, logo or login UI, and our own icons. Every post is generated from one day of real
+   measurements; follower and like counts are illustrative, and the page says so. */
+:root{
+  --calm-1:#dbe8fd; --calm-2:#9bbcf3; --clear-1:#d6f2f5; --clear-2:#7fc8d6;
+  --fresh-1:#efe4cf; --fresh-2:#c9a46e; --algae-1:#dcf3e2; --algae-2:#7cc59a;
+  --cold-1:#e8f3fb; --cold-2:#a9cfee; --deco:rgb(11 13 18 / .32);
+  --ig-font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  /* values from instagram.com's own CSS tokens and mobile-web measurements, 30 Oct 2026 (see the README) */
+  --ig-bg:#ffffff; --ig-fg:#000000; --ig-muted:#737373; --ig-line:#dbdbdb; --ig-btn:#efefef; --ig-icon-2:#8e8e8e;
+  --ig-primary:#4a5df9; --ig-on-primary:#ffffff; --ig-tab-on:#4150f7; --ig-link:#00376b; --ig-heart:#ff3040;
+  --ig-on-media:#ffffff; --ig-media-chip:rgb(18 18 18 / .7);
+  --ring-1:#14b8a6; --ring-2:#2563eb;   /* our own ring colours, not Instagram's gradient */
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --calm-1:#1a2a4a; --calm-2:#2c4f8f; --clear-1:#12343a; --clear-2:#1f6670;
+  --fresh-1:#352b1d; --fresh-2:#6b522f; --algae-1:#13301f; --algae-2:#23603f;
+  --cold-1:#172a3c; --cold-2:#2d5577; --deco:rgb(238 241 247 / .35);
+  --ig-bg:#0c1014; --ig-fg:#f5f5f5; --ig-muted:#a8a8a8; --ig-line:#262626; --ig-btn:#363636; --ig-icon-2:#a8a8a8;
+  --ig-tab-on:#708dff; --ig-link:#e0f1ff; --ring-1:#2dd4bf; --ring-2:#7aa2ff}}
+:root[data-theme="dark"]{
+  --calm-1:#1a2a4a; --calm-2:#2c4f8f; --clear-1:#12343a; --clear-2:#1f6670;
+  --fresh-1:#352b1d; --fresh-2:#6b522f; --algae-1:#13301f; --algae-2:#23603f;
+  --cold-1:#172a3c; --cold-2:#2d5577; --deco:rgb(238 241 247 / .35);
+  --ig-bg:#0c1014; --ig-fg:#f5f5f5; --ig-muted:#a8a8a8; --ig-line:#262626; --ig-btn:#363636; --ig-icon-2:#a8a8a8;
+  --ig-tab-on:#708dff; --ig-link:#e0f1ff; --ring-1:#2dd4bf; --ring-2:#7aa2ff}
+[data-mood="calm"]{--m1:var(--calm-1);--m2:var(--calm-2)}
+[data-mood="clear"]{--m1:var(--clear-1);--m2:var(--clear-2)}
+[data-mood="fresh"]{--m1:var(--fresh-1);--m2:var(--fresh-2)}
+[data-mood="algae"]{--m1:var(--algae-1);--m2:var(--algae-2)}
+[data-mood="cold"]{--m1:var(--cold-1);--m2:var(--cold-2)}
+
+html{scroll-padding:56px 0 56px}   /* keeps focused things clear of the sticky top bar and tab bar */
+[hidden]{display:none !important}   /* or a class's display wins over the hidden attribute */
+
+/* ---------- demo strip: our page, outside the mock app ---------- */
+.strip{max-width:470px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:2px 8px;
+  padding:8px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+.demotag{order:3;flex-basis:100%;font:600 .78rem/1.4 var(--body);color:var(--muted)}
+.back{display:inline-flex;align-items:center;gap:6px;min-height:40px;font:700 .95rem var(--display);color:var(--fg);text-decoration:none;border-radius:999px;padding:0 6px}
+.back svg{width:18px;height:18px}
+.tools{display:flex;gap:6px;align-items:center}
+.themebtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card-2);color:var(--fg);cursor:pointer;display:grid;place-items:center;padding:0}
+.themebtn svg{width:17px;height:17px}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--card-2)}
+.lang button{border:0;background:transparent;color:var(--muted);font:600 .8rem var(--body);padding:5px 10px;border-radius:999px;cursor:pointer;min-height:30px}
+.lang button[aria-pressed="true"]{background:var(--pill);color:var(--pill-fg)}
+
+/* ---------- the mock app ---------- */
+.app{max-width:470px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--ig-bg);color:var(--ig-fg);font:400 14px/18px var(--ig-font)}
+.app main{flex:1}
+@media (min-width:600px){
+  body{background:var(--card-2)}
+  .strip{border:0;margin-top:12px}
+  .app{margin:4px auto 0;min-height:auto;border:1px solid var(--line);border-radius:28px;overflow:clip;box-shadow:0 24px 60px -30px var(--shadow)}
+}
+.ico,.ibtn{display:inline-grid;place-items:center;flex:none;width:40px;height:40px;color:inherit}
+.ibtn{padding:0;border:0;background:none;cursor:pointer;border-radius:50%}
+.ico svg,.ibtn svg{width:24px;height:24px}
+.ibar{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:80px minmax(0,1fr) 80px;align-items:center;height:50px;padding:0 4px;background:var(--ig-bg)}
+.ibar .end{display:flex;justify-content:flex-end}
+.ibar .handle{font:700 20px/25px var(--ig-font);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* profile header */
+.head{display:flex;align-items:center;gap:20px;padding:6px 16px 10px}
+.avatar{flex:none;width:96px;height:96px;padding:3px;border:0;border-radius:50%;background:conic-gradient(from 200deg,var(--ring-1),var(--ring-2),var(--ring-1));cursor:pointer}
+.avatar svg{display:block;width:100%;height:100%;border-radius:50%;border:2px solid var(--ig-bg);background:var(--card)}
+.headr{flex:1;min-width:0;display:grid;gap:6px}
+.dname{font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0;padding:0;list-style:none}
+.stats li{display:grid}
+.stats b{font:600 16px/20px var(--ig-font)}
+@media (max-width:359px){ .stats span{font-size:13px} }
+.bio{padding:0 16px;display:grid;gap:1px}
+.bio .cat{color:var(--ig-muted)}
+.blink{justify-self:start;display:inline-flex;align-items:center;gap:4px;color:var(--ig-link);font-weight:600;text-decoration:none}
+.blink svg{width:14px;height:14px}
+.actions{display:flex;gap:6px;padding:12px 16px 8px}
+.btn{flex:1;display:grid;place-items:center;min-height:36px;border:0;border-radius:8px;font:600 14px var(--ig-font);text-decoration:none;cursor:pointer;background:var(--ig-btn);color:var(--ig-fg)}
+.btn.primary{background:var(--ig-primary);color:var(--ig-on-primary)}
+.btn.primary.on{background:var(--ig-btn);color:var(--ig-fg)}
+
+/* highlights */
+.hl{display:flex;gap:12px;overflow-x:auto;margin:0;padding:6px 16px 14px;list-style:none;scrollbar-width:none}   /* top padding: room for the focus ring, which the scroller clips */
+.hl::-webkit-scrollbar{display:none}
+.hlb{display:grid;justify-items:center;gap:5px;width:68px;padding:0;border:0;background:none;color:inherit;cursor:pointer;font:400 12px/1.2 var(--ig-font)}
+.hlc{display:block;width:66px;height:66px;padding:3px;border-radius:50%;border:1px solid var(--ig-line)}
+.hlc svg{display:block;width:100%;height:100%;border-radius:50%;background:linear-gradient(160deg,var(--m1),var(--m2))}
+.hll{max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* tabs and grid */
+.tabs{display:flex;border-top:1px solid var(--ig-line)}
+.tabs span{flex:1;display:grid;place-items:center;height:44px;color:var(--ig-icon-2)}
+.tabs .on{color:var(--ig-fg);box-shadow:inset 0 -2px 0 var(--ig-tab-on)}
+.tabs svg{width:24px;height:24px}
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px}
+.tilebtn{position:relative;display:block;width:100%;padding:0;border:0;background:none;cursor:pointer;color:inherit}
+.tilebtn:focus-visible{outline-offset:-3px}
+.tilebtn .multi{position:absolute;top:8px;right:8px;width:20px;height:20px;color:var(--ig-on-media);filter:drop-shadow(0 0 2px rgb(0 0 0 / .5))}
+.grid .post{aspect-ratio:3/4}
+
+/* one post's picture, drawn at any size with container units, so tile, feed and carousel share the markup */
+.post{container-type:inline-size;display:block;position:relative;aspect-ratio:4/5;overflow:hidden;color:var(--fg);background:linear-gradient(160deg,var(--m1),var(--m2));font-family:var(--body)}
+.post .deco{position:absolute;inset:0;width:100%;height:100%}
+/* first picture: the fjord that day, a bowl painted from the day's dives, with Gabby small on the waterline.
+   The feed and tile versions are two SVGs; the container query shows one. Data colours are fixed and read in both themes. */
+.post.fj{background:var(--card-2)}
+.fj svg{display:block;width:100%;height:100%}
+.fj .fj-tile{display:none}
+@container (max-width:260px){ .fj .fj-feed{display:none} .fj .fj-tile{display:block} }
+.fj-o{fill:none;stroke:var(--fg);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.fj-k{fill:var(--bg);stroke:var(--fg);stroke-width:2}
+.fj-in{stroke-dasharray:4.5 3.5;animation:fjflow 1.4s linear infinite}
+@keyframes fjflow{to{stroke-dashoffset:-8}}
+.fj-gab{animation:fjbob 4s ease-in-out infinite}
+@keyframes fjbob{50%{transform:translateY(.9px)}}
+.fj-lab{font:700 7px var(--body);fill:#fff;stroke:rgb(4 16 28 / .6);stroke-width:1.6px;paint-order:stroke;stroke-linejoin:round}
+.fj-d{font:800 20px var(--display);fill:var(--fg)}
+.fj-s{font:600 12px var(--body);fill:var(--muted)}
+.fj-t{font:800 60px var(--display);fill:var(--fg)}
+.fj-w{font:700 15px var(--body);fill:var(--fg)}
+.fj-dt{font:600 12.5px var(--body);fill:var(--muted)}
+.fj-c{font:700 11.5px var(--body);fill:var(--bg)}
+.fj-h{font:800 27px var(--display);fill:var(--fg)}
+.fj-g{font:700 11.5px var(--body);fill:var(--muted)}
+.fj-l{font:600 13px var(--body);fill:var(--muted)}
+.fj-v{font:700 14px var(--body);fill:var(--fg)}
+.fj-f{font:600 12.5px var(--body);fill:var(--fg)}
+.fj-on{fill:var(--accent)}
+.fj-off{fill:color-mix(in srgb,var(--muted) 26%,transparent)}
+.fj-m{fill:var(--fg);stroke:var(--bg);stroke-width:2}
+/* second carousel picture: the day's numbers */
+.post.sheet{display:flex;flex-direction:column;gap:2.4cqw;padding:7cqw 6cqw 5cqw}
+.sh-t{font:800 7cqw/1.1 var(--display)}
+.sh-d{font:600 4.2cqw/1.2 var(--body);color:var(--muted);margin:-1cqw 0 1cqw}
+.sh-r{display:flex;align-items:center;justify-content:space-between;gap:3cqw;padding:2.4cqw 3.6cqw;border-radius:3cqw;background:color-mix(in srgb,var(--bg) 80%,transparent)}
+.sh-r span{font:600 3.9cqw/1.25 var(--body);color:var(--muted)}
+.sh-r b{flex:none;font:800 6.6cqw/1.1 var(--display)}
+.sh-n{margin-top:auto;font:600 3.6cqw/1.35 var(--body)}
+.rain line{animation:fall 1.6s linear infinite}
+@keyframes fall{from{transform:translateY(-6px);opacity:0}30%{opacity:1}to{transform:translateY(10px);opacity:0}}
+.face .eye{transform-box:fill-box;transform-origin:center;animation:blink 6.5s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.08)}}
+
+/* ---------- posts feed ---------- */
+.ftitle{flex:1;min-width:0;text-align:center;line-height:1.2}
+.ftitle span{display:block;font-size:12px;color:var(--ig-muted);font-weight:600}
+.ftitle h2{font:700 16px/1.2 var(--ig-font)}
+.fp{padding-bottom:14px}   /* html's scroll-padding already clears the top bar */
+.fp:focus{outline:none}
+.fp:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.fph{display:flex;align-items:center;gap:10px;padding:8px 4px 8px 12px}
+.fph .mini{width:32px;height:32px;border-radius:50%;background:var(--card);flex:none}
+.fph .u{display:block;font-weight:600}
+.fph .loc{display:block;font-size:12px}
+.fph .ico{margin-left:auto}
+.car{position:relative}
+.slides{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;margin:0;padding:0;list-style:none}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start}
+.cnav{position:absolute;top:50%;translate:0 -50%;width:32px;height:32px;padding:0;border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:color-mix(in srgb,var(--ig-bg) 82%,transparent);color:var(--ig-fg);box-shadow:0 1px 4px rgb(0 0 0 / .25)}
+.cnav svg{width:16px;height:16px}
+/* the app has no arrows: they show on hover and keyboard focus only, and never block a swipe while invisible */
+.cnav:not(:focus-visible){opacity:0;pointer-events:none}
+@media (hover:hover){ .car:hover .cnav{opacity:1;pointer-events:auto} }
+.cnav.prev{left:8px}
+.cnav.next{right:8px}
+.count{position:absolute;top:12px;right:12px;font:600 12px/1 var(--ig-font);padding:5px 8px;border-radius:999px;background:var(--ig-media-chip);color:var(--ig-on-media)}
+.acts{position:relative;display:flex;align-items:center;padding:4px 8px 0}
+.heart[aria-pressed="true"] svg{fill:var(--ig-heart);stroke:var(--ig-heart)}
+.dots{position:absolute;left:50%;translate:-50% 0;display:flex;gap:4px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--ig-line)}
+.dots i.on{background:var(--ig-primary)}
+.acts .save{margin-left:auto}
+.likes{padding:2px 14px 0;font-weight:600}
+.cap{padding:4px 14px 0}
+.cap .u{font-weight:600}
+.cap .txt b{font-weight:inherit}   /* the caption templates bold the numbers for the main page's style; posts read as plain text */
+.tags{color:var(--ig-link)}
+.when{padding:6px 14px 0;font-size:12px;color:var(--ig-muted)}
+
+/* bottom tab bar, for the look only */
+.tabnav{position:sticky;bottom:0;z-index:3;display:flex;justify-content:space-around;align-items:center;min-height:50px;
+  padding-bottom:env(safe-area-inset-bottom,0px);background:var(--ig-bg);border-top:1px solid var(--ig-line)}
+.tabnav .me{width:26px;height:26px;border-radius:50%;background:var(--ig-btn);box-shadow:0 0 0 2px var(--ig-bg),0 0 0 3.5px var(--ig-fg)}
+
+.foot{max-width:470px;margin:0 auto;padding:14px 16px 28px;font-size:.78rem;line-height:1.5;color:var(--muted);display:grid;gap:6px}
+
+/* ---------- new post types: covers picked by rules from the day's data (draft, see docs/GABBY-NEXT.md) ---------- */
+.post.ex{display:flex;flex-direction:column;gap:2.6cqw;padding:6cqw}
+.ex>:not(.deco){position:relative}
+.chip{align-self:flex-start;font:800 3.8cqw/1 var(--body);letter-spacing:.06em;text-transform:uppercase;padding:2cqw 3.2cqw;border-radius:999px;background:var(--fg);color:var(--bg)}
+.ex-t{font:800 7.2cqw/1.12 var(--display)}
+.ex-s{font:600 4.2cqw/1.3 var(--body);color:var(--muted)}
+.ex-f{margin-top:auto;font:700 4.6cqw/1.3 var(--body)}
+.ex-face{position:absolute !important;right:5cqw;bottom:5cqw;width:22cqw;height:22cqw;border-radius:50%;background:var(--card)}
+.wk-n{font:800 22cqw/.9 var(--display);margin-top:-1cqw}
+.hm{display:block;width:100%;height:65cqw;padding:2cqw;border-radius:3cqw;background:color-mix(in srgb,var(--bg) 82%,transparent)}
+.hm text{font:700 6px var(--body);fill:var(--fg)}
+.hm .ax{font:600 5px var(--body);fill:var(--muted)}
+.hm .gap{fill:none;stroke:var(--muted);stroke-width:.6;stroke-dasharray:2 1.6}
+.rec-n{margin-top:auto;font:800 30cqw/.9 var(--display);letter-spacing:-.02em}
+.rec-n small{font:800 9cqw var(--display);margin-left:2cqw}
+.rec-l{max-width:66cqw;font:800 5.8cqw/1.2 var(--display)}
+.wk-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3cqw 5cqw;margin-top:auto;padding:0 2cqw}
+.wk-d{display:grid;justify-items:center;gap:1.4cqw;font:700 3.8cqw/1 var(--body)}
+.wk-d svg{width:100%;aspect-ratio:1;border-radius:50%;background:linear-gradient(160deg,var(--m1),var(--m2));box-shadow:0 0 0 .8cqw var(--bg)}
+.wk-d i{font-style:normal}
+.wk-s{font:700 4.4cqw/1.35 var(--body)}
+.q-mark{position:absolute !important;right:4cqw;top:0;font:800 50cqw/1 var(--display);opacity:.16}
+.q-o{display:flex;gap:3cqw;align-items:center;padding:2.2cqw 3.4cqw;border-radius:3cqw;background:color-mix(in srgb,var(--bg) 82%,transparent);font:800 6.2cqw/1.1 var(--display)}
+.q-o i{flex:none;display:grid;place-items:center;width:8cqw;height:8cqw;border-radius:50%;background:var(--fg);color:var(--bg);font:800 4.4cqw/1 var(--body);font-style:normal}
+.q-ans{margin-top:4cqw;font:800 17cqw/1 var(--display)}
+@container (max-width:260px){
+  .post.ex{padding:6cqw;gap:4cqw}
+  .ex .ex-t,.ex .ex-s,.ex .ex-f,.ex .rec-l,.ex .wk-s,.ex .q-o,.ex .ex-face,.ex .hm text{display:none}
+  .chip{font-size:7.5cqw;padding:3cqw 4.5cqw}
+  .hm{margin-top:auto;height:98cqw;padding:0;background:none}
+  .wk-n{font-size:40cqw}
+  .rec-n{font-size:34cqw}
+  .rec-n small{display:block;margin:2cqw 0 0;font-size:11cqw}
+  .q-mark{position:static !important;margin:auto;font-size:80cqw;opacity:.85}
+  .wk-row{grid-template-columns:repeat(4,minmax(0,1fr));gap:3cqw}
+  .wk-d i{display:none}
+}
+
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important} }
+</style>
+
+<svg class="defs" aria-hidden="true" focusable="false"><defs>
+  <image id="art-buoy" href="__ASSET_buoy__" width="600" height="736"/>
+  <clipPath id="fj-bowl"><path d="M6 34H94V58C94 81 74 96 50 96S6 81 6 58Z"/></clipPath>
+</defs></svg>
+
+<div class="strip">
+  <a class="back" href="../" id="back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+    <span data-i="back">Fjordstatus</span>
+  </a>
+  <p class="demotag" data-i="demoTag"></p>
+  <div class="tools">
+    <button class="themebtn" id="themebtn" type="button"></button>
+    <div class="lang" role="group" id="langGroup">
+      <button id="lang-no" type="button" data-lang="no" lang="nb" aria-label="Norsk">NO</button>
+      <button id="lang-en" type="button" data-lang="en" lang="en" aria-label="English">EN</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <main>
+    <section id="profileView" aria-labelledby="handle">
+      <div class="ibar">
+        <span class="ico" data-icon="back" aria-hidden="true"></span>
+        <h1 class="handle" id="handle" data-handle></h1>
+        <span class="end" aria-hidden="true"><span class="ico" data-icon="bell" id="bell" hidden></span><span class="ico" data-icon="more"></span></span>
+      </div>
+      <div class="head">
+        <button class="avatar" type="button" id="avatar" data-open="0"><svg viewBox="190 285 220 220" aria-hidden="true"><use href="#art-buoy"/><g class="face" id="avatarFace"></g></svg></button>
+        <div class="headr">
+          <p class="dname" data-i="dname"></p>
+          <ul class="stats num">
+            <li><b id="nPosts"></b><span data-i="posts"></span></li>
+            <li><b id="nFollowers"></b><span data-i="followers"></span></li>
+            <li><b id="nFollowing"></b><span data-i="followingLbl"></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="bio">
+        <p class="cat" data-i="cat"></p>
+        <p data-i="bio1"></p>
+        <p data-i="bio2"></p>
+        <p data-i="bio3"></p>
+        <a class="blink" id="bioLink" href="../"><span data-icon="link" aria-hidden="true"></span>gabriel.sekke.dev</a>
+      </div>
+      <div class="actions">
+        <button class="btn primary" type="button" id="follow"></button>
+        <a class="btn" id="cta" href="../" data-i="cta"></a>
+      </div>
+      <ul class="hl" id="highlights"></ul>
+      <div class="tabs" aria-hidden="true">
+        <span class="on" data-icon="grid"></span><span data-icon="reels"></span><span data-icon="tagged"></span>
+      </div>
+      <h2 class="sr" data-i="gridTitle"></h2>
+      <ul class="grid" id="grid"></ul>
+    </section>
+
+    <section id="feedView" aria-labelledby="feedTitle" hidden>
+      <div class="ibar">
+        <button class="ibtn" type="button" id="feedBack" data-icon="back"></button>
+        <div class="ftitle"><span data-handle></span><h2 id="feedTitle" data-i="gridTitle"></h2></div>
+        <span class="ico" aria-hidden="true"></span>
+      </div>
+      <div id="feed"></div>
+    </section>
+  </main>
+
+  <div class="tabnav" aria-hidden="true">
+    <span class="ico" data-icon="home"></span><span class="ico" data-icon="reels"></span><span class="ico" data-icon="send"></span>
+    <span class="ico" data-icon="search"></span><span class="ico"><span class="me"></span></span>
+  </div>
+</div>
+
+<footer class="foot">
+  <p data-i="foot1"></p>
+  <p data-i="capNote"></p>
+  <p id="foot2"></p>
+  <p id="foot3"></p>
+</footer>
+
+<script>
+document.documentElement.classList.add('js');
+const D = __DATA__;
+
+const CITATION="Muilwijk, M., Drange, H., Paasche, Ø. (2017). Gabriel conductivity-temperature-depth (CTD), oxygen, fluorescence and turbidity data from Store Lungegårdsvann in Bergen [Data set]. University of Bergen, Norway.";
+const NB='\u00a0';   // no-break space, keeps "10 °C" together (an escape, so an editor can't flatten it)
+const HANDLE='gabby.fjord', FOLLOWERS=1284, FOLLOWING=12;   // illustrative, and the footer says so
+const T = {
+ no:{
+  title:"Gabby – demo",back:"Fjordstatus",
+  demoTag:"Demo: slik kunne en daglig konto for Gabriel-bøya sett ut. Ikke en ekte konto.",
+  themeToLight:"Bytt til lyst tema",themeToDark:"Bytt til mørkt tema",ariaLang:"Språk",
+  dname:"Gabby · Gabriel-bøya",cat:"Vitenskap og teknologi",
+  bio1:"Målebøya midt i Bergen 🌊 Venner kaller meg Gabby.",
+  bio2:"Hver dag: hvordan fjorden har det, rett fra målingene mine.",
+  bio3:"Jeg måler ikke bakterier, så jeg sier aldri om det er trygt å bade.",
+  posts:"innlegg",followers:"følgere",followingLbl:"følger",
+  follow:"Følg",following:"Følger",cta:"Fjordstatus",
+  avatarAria:"Åpne nyeste innlegg",hlAria:m=>`${m}: åpne nyeste innlegg`,
+  gridTitle:"Innlegg",feedBack:"Tilbake til profilen",
+  loc:"Store Lungegårdsvann, Bergen",like:"Lik",likes:n=>`${n} liker`,
+  prevImg:"Forrige bilde",nextImg:"Neste bilde",sheetTitle:"Dagens målinger",
+  mood:{fresh:"Ferskvann",algae:"Alger",cold:"Kaldere",clear:"Klart",calm:"Rolig"},
+  head:{fresh:"Ferskvann på toppen",algae:"Grønn dag",cold:"Kaldere i overflaten",clear:"Klart, med mer sjøvann",calm:"En rolig dag"},
+  cap:{
+   fresh:f=>(f.low
+     ?`Mye ferskvann på toppen i dag! Saltholdigheten i overflaten var bare <b>${f.S}${NB}PSU</b>${f.pS?` (dagen før: ${f.pS}${NB}PSU)`:''}`
+     :`Mye ferskere på toppen enn dagen før: saltholdigheten falt fra ${f.pS} til <b>${f.S}${NB}PSU</b>`)
+     +(f.murky==='turned'?', og vannet ble grumsete':f.murky==='stayed'?', og vannet var fortsatt grumsete':'')
+     +'. Det ligner avrenning etter regn. Avrenning kan føre med seg bakterier, og dem kan jeg ikke måle.',
+   algae:f=>`Grønn dag! Fluorescensen i overflaten var <b>${f.F}${NB}µg/l</b>, omtrent ${f.r} ganger det vanlige siden ${f.since}. Det tyder på mange små alger i det øverste laget.`,
+   cold:f=>`Brr! Overflaten falt til <b>${f.T}${NB}°C</b>, ${f.dT} grader kaldere enn dagen før.`,
+   clear:f=>`Klart vann og mer sjøvann enn vanlig i overflaten i dag (<b>${f.S}${NB}PSU</b>). Overflaten holdt ${f.T}${NB}°C.`,
+   calm:f=>`En rolig dag. Overflaten holdt <b>${f.T}${NB}°C</b>.`
+     +(f.oxy==='very'?` Nede i dypet er det svært lite oksygen: ${f.O}${NB}% metning.`:f.oxy==='low'?` Nede i dypet er det lite oksygen: ${f.O}${NB}% metning.`:'')
+  },
+  facts:{sT:"Temperatur, overflaten (0–2 m)",sS:"Saltholdighet, overflaten",sTu:"Turbiditet, overflaten",sF:"Fluorescens, overflaten",dO:"Oksygen, dypet (9 m og ned)",
+    n:(n,partial)=>partial?`Bare ${n} dykk denne dagen, fordi dataene stopper her.`:`Gjennomsnitt av ${n} dykk denne dagen.`},
+  capNote:"Teksten i innleggene er laget fra dagens målinger med faste maler. Neste steg er at KI formulerer den, fra de samme tallene. Gabriel måler ikke bakterier, så innleggene sier aldri om det er trygt å bade.",
+  tileLabel:(d,temp,h)=>`${d}: ${temp} i overflaten, ${h}`,
+  foot1:"Demo laget til Hackathon Store Lungegårdsvann 2026. Ikke en offisiell side fra UiB, og ikke en ekte konto på sosiale medier. Ikke tilknyttet eller godkjent av Instagram eller Meta. Antall følgere og liker er bare til illustrasjon.",
+  foot2:d=>"Data: "+CITATION+" Data til og med "+d+".",
+  foot3:'Skrift: Raleway og Open Sans, under SIL Open Font License 1.1 (<a href="/licenses/font-raleway-OFL.txt">Raleway</a>, <a href="/licenses/font-open-sans-OFL.txt">Open Sans</a>). Illustrasjonene er KI-generert.',
+  dateLoc:"nb-NO",
+  fj:{
+   sub:n=>`Snitt av ${n} dykk rett under Gabriel-bøya`,subPartial:n=>`Bare ${n} dykk rett under bøya: dataene stopper her`,
+   tw:{cold:"Kaldt",cool:"Kjølig",mild:"Mildt",warm:"Varmt"},atSurf:w=>`${w} i overflaten`,
+   same:"Omtrent som i går",warmer:v=>`${v}° varmere enn i går`,colder:v=>`${v}° kaldere enn i går`,
+   headCalm:{after:"Roligere igjen",warm:"Rolig og litt varmere",cool:"Rolig og litt kjøligere"},
+   streak:n=>`${n}. dag på rad`,
+   rec:{fresh:m=>`Ferskest hittil i ${m}`,cold:m=>`Kaldest hittil i ${m}`,clear:m=>`Saltest hittil i ${m}`,algae:m=>`Grønnest hittil i ${m}`},
+   group:"I overflaten (0–2 m)",rows:{salt:"Hvor salt",clar:"Klarhet",alg:s=>`Alger, mot nivået siden ${s}`},algShort:"Alger",
+   words:{salt:["Mye ferskvann","Blandet","Salt"],clar:["Klart","Grumsete"],alg:["Ikke mange","Mange alger"],oxy:["Svært lavt","Lavt","Bra"]},
+   lidT:"Ferskvann",lid:h=>`ca. ${h} m`,lidDeep:"mer enn 5 m",low:"Lite oksygen",
+   runoff:"Avrenning kan føre med seg bakterier, og dem kan jeg ikke måle."
+  },
+  ex:{
+   strip:"Dykk for dykk",stripLeg:"Lys = ferskere vann, mørk = saltere",stripFoot:(a,b)=>`Overflaten: ${a} → ${b}${NB}PSU`,
+   fell:(a,b)=>` Det skjedde i løpet av dagen: fra ${a.v}${NB}PSU kl.${NB}${a.t} til ${b.v}${NB}PSU kl.${NB}${b.t}.`,
+   swung:(hi,lo)=>` Mellom dykkene svingte overflaten mellom ${hi.v}${NB}PSU (kl.${NB}${hi.t}) og ${lo.v}${NB}PSU (kl.${NB}${lo.t}).`,
+   top3:"Topp 3",recLine:(rank,of)=>`${rank}. ferskeste dag av ${of} dager jeg har målt`,
+   recCap:(S,rank,of,dates)=>`En av de ferskeste dagene i målingene mine: overflaten var i snitt <b>${S}${NB}PSU</b>, den ${rank}. ferskeste av de ${of} dagene jeg har målt saltholdighet siden 2015. Bare ${dates} var ferskere. Det ligner avrenning etter regn. Avrenning kan føre med seg bakterier, og dem kan jeg ikke måle.`,
+   and:"og",
+   weekWord:"Uke",weekT:"Uka i fjorden",
+   weekStats:(n,s0,s1,t0,t1)=>`${n} dykk · overflaten ${s0}–${s1}${NB}PSU · ${t0} → ${t1}${NB}°C`,
+   weekCap:(w,n,fresh,t0,t1)=>`Uke ${w} i fjorden: ${n} dykk.${fresh} Overflaten gikk fra ${t0} til <b>${t1}${NB}°C</b>.`,
+   weekFresh:(day,S,sunS)=>` På ${day} lignet det avrenning: overflaten var nede i ${S}${NB}PSU, og på søndag var den ${sunS}${NB}PSU. Avrenning kan føre med seg bakterier, og dem kan jeg ikke måle.`,
+   quiz:"Quiz",quizQ:"Hvor mye oksygen målte jeg 17,5 meter ned i dag?",quizSub:n=>`I snitt over dagens ${n} dykk.`,quizSwipe:"Sveip for svaret →",
+   answer:"Svar",quizA:o=>`C: ${o}${NB}%`,
+   quizWhy:(deep,top)=>`A var snittet fra 9${NB}m og ned (${deep}${NB}%), B de øverste 2${NB}m (${top}${NB}%). Helt nede ved bunnen er det nesten tomt for oksygen.`,
+   quizCap:"Onsdagsquiz! Gjett først, og sveip for svaret. ",
+   algaeUp:(n,F,r,since)=>`Grønn rekke, dag ${n}, og den grønneste dagen så langt: fluorescensen i overflaten var <b>${F}${NB}µg/l</b>, omtrent ${r} ganger det vanlige siden ${since}.`,
+   algaeStill:(n,F,pF,up)=>`Fortsatt grønt, dag ${n}: <b>${F}${NB}µg/l</b> i overflaten, ${up?'opp':'ned'} fra ${pF} i går.`,
+   calmSame:(T,S)=>`Stødig dag: <b>${T}${NB}°C</b> på toppen, det samme som i går, og ${S}${NB}PSU.`,
+   calmDeep:(T,O)=>`Rolig på toppen, ${T}${NB}°C. Nede i dypet er det en annen historie: bare <b>${O}${NB}%</b> oksygenmetning.`,
+   calmDelta:(T,dT,up)=>`<b>${T}${NB}°C</b> på toppen i dag, ${dT} grader ${up?'varmere':'kaldere'} enn i går. Ellers rolig.`,
+   coldLow:(T,dT)=>`Kaldeste dag denne måneden så langt: <b>${T}${NB}°C</b> i overflaten, ${dT} grader under i går.`,
+   coldAgain:(T,dT)=>`Brr, igjen! <b>${T}${NB}°C</b> på toppen, ${dT} grader kaldere enn i går, og igjen den kaldeste dagen denne måneden.`,
+   clearWeek:(wd,pS,S,T)=>`Forrige ${wd} var toppen nede i ${pS}${NB}PSU. I dag: <b>${S}${NB}PSU</b>, og klart vann. Overflaten holdt ${T}${NB}°C.`
+  }
+ },
+ en:{
+  title:"Gabby – demo",back:"Fjord status",
+  demoTag:"Demo: how a daily account for the Gabriel buoy could look. Not a real account.",
+  themeToLight:"Switch to light theme",themeToDark:"Switch to dark theme",ariaLang:"Language",
+  dname:"Gabby · the Gabriel buoy",cat:"Science & technology",
+  bio1:"The measuring buoy in the middle of Bergen 🌊 Friends call me Gabby.",
+  bio2:"Every day: how the fjord is doing, straight from my measurements.",
+  bio3:"I don't measure bacteria, so I never say whether it's safe to swim.",
+  posts:"posts",followers:"followers",followingLbl:"following",
+  follow:"Follow",following:"Following",cta:"Fjord status",
+  avatarAria:"Open the latest post",hlAria:m=>`${m}: open the latest post`,
+  gridTitle:"Posts",feedBack:"Back to profile",
+  loc:"Store Lungegårdsvann, Bergen",like:"Like",likes:n=>`${n} likes`,
+  prevImg:"Previous image",nextImg:"Next image",sheetTitle:"The day's measurements",
+  mood:{fresh:"Fresh water",algae:"Algae",cold:"Colder",clear:"Clear",calm:"Calm"},
+  head:{fresh:"Fresh water on top",algae:"Green day",cold:"Colder at the surface",clear:"Clear, more sea water",calm:"A calm day"},
+  cap:{
+   fresh:f=>(f.low
+     ?`Lots of fresh water on top today! Surface salinity was only <b>${f.S}${NB}PSU</b>${f.pS?` (the day before: ${f.pS}${NB}PSU)`:''}`
+     :`Much fresher on top than the day before: salinity fell from ${f.pS} to <b>${f.S}${NB}PSU</b>`)
+     +(f.murky==='turned'?', and the water turned murky':f.murky==='stayed'?', and the water was still murky':'')
+     +". That looks like runoff after rain. Runoff can carry bacteria, and those I can't measure.",
+   algae:f=>`Green day! Surface fluorescence was <b>${f.F}${NB}µg/l</b>, about ${f.r} times the typical level since ${f.since}. That points to lots of tiny algae in the top layer.`,
+   cold:f=>`Brr! The surface dropped to <b>${f.T}${NB}°C</b>, ${f.dT} degrees colder than the day before.`,
+   clear:f=>`Clear water and more sea water than usual at the surface today (<b>${f.S}${NB}PSU</b>). The surface held ${f.T}${NB}°C.`,
+   calm:f=>`A calm day. The surface held <b>${f.T}${NB}°C</b>.`
+     +(f.oxy==='very'?` Deep down, oxygen is very low: ${f.O}${NB}% saturation.`:f.oxy==='low'?` Deep down, oxygen is low: ${f.O}${NB}% saturation.`:'')
+  },
+  facts:{sT:"Temperature, surface (0–2 m)",sS:"Salinity, surface",sTu:"Turbidity, surface",sF:"Fluorescence, surface",dO:"Oxygen, deep (9 m and below)",
+    n:(n,partial)=>partial?`Only ${n} dives that day, because the data stops here.`:`Average of ${n} dives that day.`},
+  capNote:"The post text is generated from the day's measurements with fixed templates. The next step is AI phrasing it from the same numbers. Gabriel doesn't measure bacteria, so the posts never say whether it is safe to swim.",
+  tileLabel:(d,temp,h)=>`${d}: ${temp} at the surface, ${h}`,
+  foot1:"Demo made for Hackathon Store Lungegårdsvann 2026. Not an official UiB page, and not a real social media account. Not affiliated with or endorsed by Instagram or Meta. Follower and like counts are illustrative only.",
+  foot2:d=>"Data: "+CITATION+" Data up to "+d+".",
+  foot3:'Fonts: Raleway and Open Sans, under the SIL Open Font License 1.1 (<a href="/licenses/font-raleway-OFL.txt">Raleway</a>, <a href="/licenses/font-open-sans-OFL.txt">Open Sans</a>). The illustrations are AI-generated.',
+  dateLoc:"en-GB",
+  fj:{
+   sub:n=>`Average of ${n} dives right under the Gabriel buoy`,subPartial:n=>`Only ${n} dives right under the buoy: the data stops here`,
+   tw:{cold:"Cold",cool:"Cool",mild:"Mild",warm:"Warm"},atSurf:w=>`${w} at the surface`,
+   same:"About the same as yesterday",warmer:v=>`${v}° warmer than yesterday`,colder:v=>`${v}° colder than yesterday`,
+   headCalm:{after:"Calmer again",warm:"Calm and a little warmer",cool:"Calm and a little cooler"},
+   streak:n=>`Day ${n} in a row`,
+   rec:{fresh:m=>`Freshest so far in ${m}`,cold:m=>`Coldest so far in ${m}`,clear:m=>`Saltiest so far in ${m}`,algae:m=>`Greenest so far in ${m}`},
+   group:"At the surface (0–2 m)",rows:{salt:"How salty",clar:"Clarity",alg:s=>`Algae, vs. the level since ${s}`},algShort:"Algae",
+   words:{salt:["Lots of fresh water","Mixed","Salty"],clar:["Clear","Murky"],alg:["Not many","Lots of algae"],oxy:["Very low","Low","Good"]},
+   lidT:"Fresh water",lid:h=>`about ${h} m`,lidDeep:"more than 5 m",low:"Little oxygen",
+   runoff:"Runoff can carry bacteria, and those I can't measure."
+  },
+  ex:{
+   strip:"Dive by dive",stripLeg:"Pale = fresher water, dark = saltier",stripFoot:(a,b)=>`Surface: ${a} → ${b}${NB}PSU`,
+   fell:(a,b)=>` It happened during the day: from ${a.v}${NB}PSU at ${a.t} to ${b.v}${NB}PSU at ${b.t}.`,
+   swung:(hi,lo)=>` Between my dives the surface swung between ${hi.v}${NB}PSU (${hi.t}) and ${lo.v}${NB}PSU (${lo.t}).`,
+   top3:"Top 3",recLine:(rank,of)=>`${rank===3?'3rd':rank+'th'} freshest of the ${of} days I've measured`,
+   recCap:(S,rank,of,dates)=>`One of the freshest days in my records: the surface averaged <b>${S}${NB}PSU</b>, the ${rank===3?'3rd':rank+'th'} freshest of the ${of} days I've measured salinity since 2015. Only ${dates} were fresher. That looks like runoff after rain. Runoff can carry bacteria, and those I can't measure.`,
+   and:"and",
+   weekWord:"Week",weekT:"My week in the fjord",
+   weekStats:(n,s0,s1,t0,t1)=>`${n} dives · surface ${s0}–${s1}${NB}PSU · ${t0} → ${t1}${NB}°C`,
+   weekCap:(w,n,fresh,t0,t1)=>`Week ${w} in the fjord: ${n} dives.${fresh} The surface went from ${t0} to <b>${t1}${NB}°C</b>.`,
+   weekFresh:(day,S,sunS)=>` On ${day} it looked like runoff: the surface was down to ${S}${NB}PSU, and by Sunday it was ${sunS}${NB}PSU. Runoff can carry bacteria, and those I can't measure.`,
+   quiz:"Quiz",quizQ:"How much oxygen did I measure 17.5 m down today?",quizSub:n=>`Averaged over today's ${n} dives.`,quizSwipe:"Swipe for the answer →",
+   answer:"Answer",quizA:o=>`C: ${o}${NB}%`,
+   quizWhy:(deep,top)=>`A was the average from 9${NB}m down (${deep}${NB}%), B the top 2${NB}m (${top}${NB}%). Right at the bottom there is almost no oxygen left.`,
+   quizCap:"Wednesday quiz! Guess first, then swipe for the answer. ",
+   algaeUp:(n,F,r,since)=>`Green streak, day ${n}, and the greenest day so far: surface fluorescence was <b>${F}${NB}µg/l</b>, about ${r} times the typical level since ${since}.`,
+   algaeStill:(n,F,pF,up)=>`Still green, day ${n}: <b>${F}${NB}µg/l</b> at the surface, ${up?'up':'down'} from ${pF} yesterday.`,
+   calmSame:(T,S)=>`Steady day: <b>${T}${NB}°C</b> on top, the same as yesterday, and ${S}${NB}PSU.`,
+   calmDeep:(T,O)=>`Calm on top at ${T}${NB}°C. Deep down it's another story: only <b>${O}${NB}%</b> oxygen saturation.`,
+   calmDelta:(T,dT,up)=>`<b>${T}${NB}°C</b> on top today, ${dT} degrees ${up?'warmer':'colder'} than yesterday. Otherwise calm.`,
+   coldLow:(T,dT)=>`Coldest day of the month so far: <b>${T}${NB}°C</b> at the surface, ${dT} degrees down on yesterday.`,
+   coldAgain:(T,dT)=>`Brr, again! <b>${T}${NB}°C</b> on top, ${dT} degrees colder than yesterday, and once more the coldest day this month.`,
+   clearWeek:(wd,pS,S,T)=>`Last ${wd} the top was down at ${pS}${NB}PSU. Today: <b>${S}${NB}PSU</b>, and clear water. The surface held ${T}${NB}°C.`
+  }
+ }
+};
+
+// ---------- language (same keys as the main page, so the choice carries over) ----------
+function detectLang(){
+  const q=new URLSearchParams(location.search).get('lang');
+  if(q==='no'||q==='en') return q;
+  try{const s=localStorage.getItem('gabriel-lang'); if(s==='no'||s==='en') return s;}catch(e){}
+  const langs=(navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||'en']);
+  return langs.some(l=>/^(nb|nn|no)\b/i.test(l))?'no':'en';
+}
+let L=detectLang();
+const fmt=(v,d=1)=>{
+  if(v==null||Number.isNaN(v)) return '–';
+  if(Math.abs(v)<0.5*10**-d) v=0;   // no "-0.0"
+  return v.toLocaleString(T[L].dateLoc,{minimumFractionDigits:d,maximumFractionDigits:d});
+};
+const nf=n=>n.toLocaleString(T[L].dateLoc);
+
+// ---------- one fact sheet per day, from the heatmap block (same layers as the main page) ----------
+const H=D.heat, SURF=[], DEEP=[];
+H.depths.forEach((z,j)=>{ if(z<2) SURF.push(j); if(z>=9) DEEP.push(j); });
+const byDay=new Map();
+H.ts.forEach((t,i)=>{ const k=t.slice(0,10); if(!byDay.has(k)) byDay.set(k,[]); byDay.get(k).push(i); });   // ts is local time
+function mean(p,idx,cols){ let s=0,n=0; for(const i of idx) for(const j of cols){ const v=H[p][i]?.[j]; if(v!=null){s+=v;n++;} } return n?s/n:null; }
+function median(a){ if(!a.length) return null; const s=[...a].sort((x,y)=>x-y), h=s.length>>1; return s.length%2?s[h]:(s[h-1]+s[h])/2; }
+const col=(p,idx)=>H.depths.map((_,j)=>mean(p,idx,[j]));   // the day's mean profile, one value per depth bin
+const days=[...byDay].map(([k,idx])=>({k,n:idx.length,
+  sT:mean('temperature',idx,SURF),sS:mean('salinity',idx,SURF),sTu:mean('turbidity',idx,SURF),
+  sF:mean('fluorescence',idx,SURF),dO:mean('oxygen',idx,DEEP),
+  prof:{S:col('salinity',idx),O:col('oxygen',idx),Tu:col('turbidity',idx),F:col('fluorescence',idx)}}));
+const DAY=864e5, dayDate=k=>{ const [y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); };
+// fluorescence baseline: only the dives before that day, as a daily post would know it
+function fBefore(k){ const v=[]; H.ts.forEach((t,i)=>{ if(t.slice(0,10)<k) SURF.forEach(j=>{ const x=H.fluorescence[i]?.[j]; if(x!=null) v.push(x); }); }); return median(v); }
+// Mood rules, checked against Oct 2026: runoff 5-6 and 15-16 Oct, algae 1-4 Oct, cooling 9/17/19 Oct, clear 13-14 Oct.
+function moodOf(d,p){
+  const drop=p&&p.sS!=null&&d.sS!=null?p.sS-d.sS:0;
+  if(d.sS!=null&&(d.sS<10||drop>=6||(drop>=3&&d.sTu!=null&&d.sTu>=1))) return 'fresh';
+  if(d.fBase&&d.sF!=null&&d.sF>=2&&d.sF>=2*d.fBase) return 'algae';
+  if(p&&p.sT!=null&&d.sT!=null&&d.sT<=p.sT-0.3) return 'cold';
+  if(d.sS!=null&&d.sS>=22&&d.sTu!=null&&d.sTu<0.5) return 'clear';   // 22: where the main page starts calling the surface salty
+  return 'calm';
+}
+days.forEach((d,i)=>{
+  const p=days[i-1];
+  d.prev=p&&dayDate(d.k)-dayDate(p.k)<=1.5*DAY?p:null;   // "the day before" only when it is the day before
+  d.fBase=fBefore(d.k);
+  d.mood=moodOf(d,d.prev);
+});
+const lastDay=days[days.length-1];
+// the posts: every day in the month of the latest dive, newest first
+const month=D.last.slice(0,7);
+const posts=days.filter(d=>d.k.slice(0,7)===month).reverse();
+const MOODS=['fresh','algae','cold','clear','calm'];
+const liked=new Set();
+let following=false;
+// illustrative like counts: stable per day, a little higher on the eventful days
+const likesOf=d=>38+(+d.k.slice(8)*47)%64+{fresh:55,algae:40,cold:20,clear:25,calm:0}[d.mood]+(liked.has(d.k)?1:0);
+
+// ---------- drawing ----------
+// mascot face: big glossy eyes, rosy cheeks, a mouth per mood (screen.html draws the same face)
+const EYES=`<g class="eye"><ellipse cx="270" cy="364" rx="14" ry="17" fill="#1b2230"/><circle cx="275.5" cy="357" r="5.5" fill="#fff"/><circle cx="265" cy="371.5" r="2.4" fill="#fff" opacity=".8"/></g>
+<g class="eye"><ellipse cx="330" cy="364" rx="14" ry="17" fill="#1b2230"/><circle cx="335.5" cy="357" r="5.5" fill="#fff"/><circle cx="325" cy="371.5" r="2.4" fill="#fff" opacity=".8"/></g>`;
+const CHEEKS=c=>`<ellipse cx="247" cy="389" rx="10" ry="5.5" fill="${c}" opacity=".5"/><ellipse cx="353" cy="389" rx="10" ry="5.5" fill="${c}" opacity=".5"/>`;
+const MOUTH={
+  calm:'<path d="M290 389q10 8 20 0" fill="none" stroke="#1b2230" stroke-width="4" stroke-linecap="round"/>',
+  clear:'<path d="M287 386h26q0 13-13 13t-13-13z" fill="#1b2230"/><ellipse cx="300" cy="395.5" rx="5.5" ry="2.8" fill="#f08a8a"/>',
+  algae:'<path d="M287 386h26q0 13-13 13t-13-13z" fill="#1b2230"/><ellipse cx="300" cy="395.5" rx="5.5" ry="2.8" fill="#f08a8a"/>',
+  fresh:'<ellipse cx="300" cy="392" rx="5.5" ry="7" fill="#1b2230"/>',
+  cold:'<path d="M286 393q3.5-4.5 7 0t7 0t7 0t7 0" fill="none" stroke="#1b2230" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+const face=m=>EYES+CHEEKS(m==='cold'?'#7fb6ea':'#f08a8a')+MOUTH[m];
+const DECO={
+  fresh:'<g class="rain" stroke="var(--deco)" stroke-width="1.3" stroke-linecap="round">'+[[10,8],[26,20],[44,6],[70,10],[88,22],[16,40],[84,46],[58,24]].map(([x,y],i)=>`<line x1="${x}" y1="${y}" x2="${x-2.5}" y2="${y+8}" style="animation-delay:${(i*0.21).toFixed(2)}s"/>`).join('')+'</g>',
+  algae:'<g fill="var(--deco)">'+[[9,30,2.4],[20,52,1.6],[86,30,2.8],[78,56,1.8],[92,64,1.3],[14,70,2],[70,16,1.4],[30,12,1.6]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')+'</g>',
+  cold:'<g stroke="var(--deco)" stroke-width="1.1" stroke-linecap="round">'+[[12,24],[86,18],[90,52],[10,58],[74,8]].map(([x,y])=>`<path d="M${x-2.5} ${y}h5M${x} ${y-2.5}v5M${x-1.8} ${y-1.8}l3.6 3.6M${x+1.8} ${y-1.8}l-3.6 3.6"/>`).join('')+'</g>',
+  clear:'<g fill="none" stroke="var(--deco)" stroke-width="1">'+[[12,30,2.6],[18,52,1.8],[86,34,3],[80,58,1.6]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')+'</g>',
+  calm:'<g fill="none" stroke="var(--deco)" stroke-width="1">'+[[12,34,2.2],[86,40,2.6],[80,62,1.4]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')+'</g>'
+};
+// our own outline icons (24×24)
+const ico=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const ICON={
+  back:ico('<path d="M15 5l-7 7 7 7"/>'),
+  next:ico('<path d="M9 5l7 7-7 7"/>'),
+  bell:ico('<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>'),
+  more:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
+  grid:ico('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/>'),
+  reels:ico('<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 8.5h18M8.5 3l3 5.5M14.5 3l3 5.5"/><path d="M10.5 12v5l4.2-2.5z"/>'),
+  tagged:ico('<rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="10" r="3"/><path d="M7 19c1-2.8 2.8-4 5-4s4 1.2 5 4"/>'),
+  heart:ico('<path d="M12 20.5s-7.5-4.6-9.2-9.4A4.9 4.9 0 0 1 12 7.2a4.9 4.9 0 0 1 9.2 3.9C19.5 15.9 12 20.5 12 20.5z"/>'),
+  comment:ico('<path d="M20.5 11.6a8.5 8.5 0 1 0-3.9 7.1l3.9 1.3-1.2-3.8a8.4 8.4 0 0 0 1.2-4.6z"/>'),
+  send:ico('<path d="M21.5 2.5L10.6 13.4"/><path d="M21.5 2.5l-6.8 19-4.1-8.1-8.1-4.1z"/>'),
+  save:ico('<path d="M6 3.5h12v17l-6-5-6 5z"/>'),
+  home:ico('<path d="M3.5 10.5L12 3l8.5 7.5V20a1 1 0 0 1-1 1H15v-6H9v6H4.5a1 1 0 0 1-1-1z"/>'),
+  search:ico('<circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/>'),
+  link:ico('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>'),
+  multi:'<svg class="multi" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 2h11a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3h-1V8a3 3 0 0 0-3-3H5a3 3 0 0 1 3-3z"/><rect x="2" y="7" width="15" height="15" rx="3"/></svg>'
+};
+document.querySelectorAll('[data-icon]').forEach(el=>{ el.insertAdjacentHTML('afterbegin',ICON[el.dataset.icon]); });
+const mini=m=>`<svg class="mini" viewBox="190 285 220 220" aria-hidden="true"><use href="#art-buoy"/><g class="face">${face(m)}</g></svg>`;
+const dayMonth=k=>dayDate(k).toLocaleDateString(T[L].dateLoc,{day:'numeric',month:'long'});
+const longDate=k=>dayDate(k).toLocaleDateString(T[L].dateLoc,{weekday:'long',day:'numeric',month:'long'});
+// ---------- first picture: the fjord that day as a bowl, painted from the day's dives (docs/GABBY-NEXT.md) ----------
+// The main page's thresholds: 22 PSU salty, 1 FTU murky, oxygen 10/40 %, 6/12/17 °C. Words compare shown (rounded) values.
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+// first depth where a profile reaches th, interpolated between bins; 0 if the top bin already does, null if it never does
+function crossUp(pr,th){
+  let last=null;
+  for(let j=0;j<pr.length;j++){ const v=pr[j]; if(v==null) continue;
+    if(v>=th) return last?last[1]+(th-last[0])/(v-last[0])*(H.depths[j]-last[1]):0;
+    last=[v,H.depths[j]]; }
+  return null;
+}
+// depth from which a profile stays under th down to the bottom; null if the bottom bin is not under it
+function staysBelow(pr,th){
+  const js=pr.map((v,j)=>v==null?-1:j).filter(j=>j>=0);
+  if(!js.length||pr[js.at(-1)]>=th) return null;
+  let k=null; for(let i=js.length-1;i>=0;i--) if(pr[js[i]]>=th){ k=js[i]; break; }
+  if(k==null) return 0;
+  const n=js.find(j=>j>k);
+  return H.depths[k]+(pr[k]-th)/(pr[k]-pr[n])*(H.depths[n]-H.depths[k]);
+}
+// where the run of bins at or over th that starts at the top ends; 0 if the top bin is under th
+function topRun(pr,th){
+  if(pr[0]==null||pr[0]<th) return 0;
+  let last=[pr[0],H.depths[0]];
+  for(let j=1;j<pr.length;j++){ const v=pr[j]; if(v==null) continue;
+    if(v<th) return last[1]+(last[0]-th)/(last[0]-v)*(H.depths[j]-last[1]);
+    last=[v,H.depths[j]]; }
+  return H.depths.at(-1);
+}
+const FJ_TOP=.55;   // the top 5 m get 55 % of the bowl (about 3x), so thin layers stay visible; the feed picture has a ruler
+const ymap=z=>{ z=clamp(z,0,17.5); return z<=5?34+62*FJ_TOP*z/5:34+62*FJ_TOP+62*(1-FJ_TOP)*(z-5)/12.5; };   // depth -> bowl units
+function fjOf(d){
+  const p=d.prev, T10=r1(d.sT), dt=p?T10-r1(p.sT):null;
+  const hk=d.mood!=='calm'?d.mood:p&&p.mood==='fresh'?'after':dt!=null&&dt>=2?'warm':dt!=null&&dt<=-2?'cool':'calm';
+  // chip: a record for the day's own measure (needs 7 earlier days this month), else a same-mood streak
+  let chip=null;
+  const earlier=days.filter(x=>x.k.slice(0,7)===d.k.slice(0,7)&&x.k<d.k);
+  const rec={fresh:['sS',-1,10],cold:['sT',-1,10],clear:['sS',1,10],algae:['sF',1,100]}[d.mood];
+  if(rec&&earlier.length>=7){ const [key,sign,prec]=rec, mine=Math.round(d[key]*prec);
+    if(earlier.every(x=>sign*(mine-Math.round(x[key]*prec))>0)) chip={rec:d.mood}; }
+  if(!chip){ let n=1; for(let x=p;x&&x.mood===d.mood;x=x.prev) n++; if(n>=2) chip={streak:n}; }
+  const S10=r1(d.sS), Tu100=Math.round(d.sTu*100), O0=Math.round(d.dO), clar=Tu100<100?0:1;
+  const bloom=!!(d.fBase&&d.sF>=2&&d.sF>=2*d.fBase);   // moodOf's algae rule
+  const ai=d.fBase?Math.min(d.sF/2,d.sF/(2*d.fBase)):0;   // 1 = exactly that rule
+  const lid=crossUp(d.prof.S,22), lidH=lid==null?null:Math.round(lid*2)/2, hasLid=lid==null||lidH>=.5;
+  const ox40=staysBelow(d.prof.O,40);
+  const murk=clar?Math.max(1,topRun(d.prof.Tu,1)):0, bloomZ=bloom?Math.max(1,topRun(d.prof.F,2)):0;
+  return {T10,dt,hk,chip,tw:T10<60?'cold':T10<120?'cool':T10<170?'mild':'warm',
+    band:[S10<100?0:S10<220?1:2,clar,+bloom,O0<10?0:O0<40?1:2],
+    pos:[clamp(d.sS/33),clamp(d.sTu/1.5),clamp(ai/3),clamp(d.dO/100)],
+    lidH,hasLid,yLid:ymap(hasLid?(lid==null?5:lid):0),yLow:ox40==null?null:ymap(ox40),
+    yMurk:ymap(murk),murkA:clar?.6+.35*clamp((d.sTu-1)/.5):0,yBloom:ymap(bloomZ),greenA:bloom?.55+.35*clamp((ai-1)/2):0,
+    specks:clar?clamp(Math.round(6+8*(d.sTu-1)/.5),6,14):0,dots:bloom?clamp(Math.round(4*ai),4,12):0,
+    mark:{fresh:'inflow',cold:'thermo',clear:'glint'}[d.mood]||null};
+}
+function fjText(d,f){
+  const t=T[L].fj, ld=longDate(d.k);
+  const month=dayDate(d.k).toLocaleDateString(T[L].dateLoc,{month:'long'});
+  return {date:ld[0].toUpperCase()+ld.slice(1),
+    sub:(d===lastDay&&d.n<6?t.subPartial:t.sub)(d.n),
+    head:t.headCalm[f.hk]||T[L].head[f.hk],
+    temp:fmt(f.T10/10)+'°',tw:t.atSurf(t.tw[f.tw]),
+    delta:f.dt==null?'':Math.abs(f.dt)<=1?t.same:(f.dt>0?t.warmer:t.colder)(fmt(Math.abs(f.dt)/10)),
+    chip:!f.chip?'':f.chip.streak?t.streak(f.chip.streak):t.rec[f.chip.rec](month),
+    words:['salt','clar','alg','oxy'].map((k,i)=>t.words[k][f.band[i]]),
+    lid2:!f.hasLid?'':f.lidH!=null&&f.lidH<=5?t.lid(fmt(f.lidH,f.lidH%1?1:0)):t.lidDeep,
+    foot:d.mood==='fresh'?t.runoff:T[L].bio3};
+}
+const FJ_WAVE=y=>`M0 ${y}q3.125-1.5 6.25 0`+'t6.25 0'.repeat(15);
+const FJ_SPECK=[[12,.35],[22,.7],[33,.4],[44,.75],[55,.3],[66,.6],[88,.5],[17,.85],[28,.2],[39,.55],[50,.85],[61,.25],[70,.8],[86,.25]];
+const FJ_DOT=[[14,.3],[26,.65],[38,.35],[50,.7],[62,.3],[88,.55],[20,.85],[44,.9],[68,.8],[32,.15],[56,.15],[86,.2]];
+const n1=v=>v.toFixed(1);
+// the bowl in 0-100 units: waterline y 34, bottom y 96 (17.5 m), clipped by #fj-bowl in the page's defs
+function fjSym(d,f,x,tile){
+  const t=T[L].fj, o=['<g clip-path="url(#fj-bowl)"><rect y="34" width="100" height="62" fill="#4a7fc9"/>'];
+  if(f.yLid>34) o.push(`<rect y="34" width="100" height="${n1(f.yLid-34)}" fill="#8fc0ea"/>`);
+  if(f.murkA) o.push(`<rect y="34" width="100" height="${n1(f.yMurk-34)}" fill="#966834" fill-opacity="${f.murkA.toFixed(2)}"/>`);
+  if(f.greenA) o.push(`<rect y="34" width="100" height="${n1(f.yBloom-34)}" fill="#369654" fill-opacity="${f.greenA.toFixed(2)}"/>`);
+  if(f.yLow!=null) o.push(`<rect y="${n1(f.yLow)}" width="100" height="${n1(96-f.yLow)}" fill="#1d2f57"/>`);
+  if(f.specks) o.push('<g fill="#4a2a10" opacity=".6">'+FJ_SPECK.slice(0,f.specks).map(([a,k])=>`<circle cx="${a}" cy="${n1(34+(f.yMurk-34)*k)}" r="1.3"/>`).join('')+'</g>');
+  if(f.dots) o.push('<g fill="#2f9e55" stroke="#eafbe9" stroke-width=".7">'+FJ_DOT.slice(0,f.dots).map(([a,k])=>`<circle cx="${a}" cy="${n1(34+(f.yBloom-34)*k)}" r="2.1"/>`).join('')+'</g>');
+  if(f.mark==='glint') o.push('<path d="M16 38l-5 26M30 38l-3 30M44 38l-1 26" stroke="#fff" stroke-opacity=".55" stroke-width="2.2" stroke-linecap="round"/>');
+  if(f.hasLid) o.push(`<path d="${FJ_WAVE(n1(f.yLid))}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="1.1"/>`);
+  o.push('</g><path class="fj-o" d="M6 34V58C6 81 26 96 50 96S94 81 94 58V34"/>');
+  if(f.mark==='inflow') o.push('<path class="fj-o fj-in" d="M0 3C8 8 13 17 15 29M15 0C22 7 27 16 29 29"/><path class="fj-o" d="M11 26l4 4 3-5M25 26l4 4 3-5"/>');
+  else if(f.mark==='thermo') o.push('<rect x="15" y="2" width="9" height="22" rx="4.5" class="fj-k"/><circle cx="19.5" cy="26.5" r="5.5" class="fj-o" style="fill:#3b82f6"/><path class="fj-o" d="M5 5v15m-4-4 4 4 4-4"/>');
+  else if(f.mark==='glint') o.push('<path class="fj-o" d="M17 4l2.6 7.4L27 14l-7.4 2.6L17 24l-2.6-7.4L7 14l7.4-2.6z" style="fill:#ffd54a;stroke-width:1.6"/>');
+  if(!tile) o.push('<g class="fj-gab"><path d="M77 35V85" stroke="var(--fg)" stroke-opacity=".75" stroke-width=".8"/><rect x="75.4" y="85" width="3.2" height="7" rx="1.2" fill="#d9dde3" stroke="#1b2230" stroke-width=".4"/>'
+    +`<svg x="60" y="4.5" width="34" height="30" viewBox="190 285 220 194"><use href="#art-buoy"/><g class="face">${face(d.mood)}</g></svg></g>`);
+  o.push('<path class="fj-o" d="M4 34q5.75-3.6 11.5 0t11.5 0t11.5 0t11.5 0t11.5 0t11.5 0t11.5 0t11.5 0"/>');   // the waterline, over Gabby's cut-off
+  if(!tile){
+    if(x.lid2) o.push(`<text class="fj-lab" x="9" y="${n1(f.yLid+7.6)}">↑ ${t.lidT}<tspan x="13" dy="7.6">${x.lid2}</tspan></text>`);
+    if(f.yLow!=null) o.push(`<text class="fj-lab" x="48" y="${n1(f.yLow+7.6)}" text-anchor="middle">${t.low}</text>`);
+    o.push(`<path d="${[1,2,3,4,5,10,15].map(z=>`M73.5 ${n1(ymap(z))}h2.5`).join('')}" stroke="#fff" stroke-opacity=".75" stroke-width=".8"/>`
+      +`<text class="fj-lab" x="72.5" y="${n1(ymap(5)+2.3)}" text-anchor="end" style="font-size:5.6px">5 m</text>`);
+  }
+  return o.join('');
+}
+const FJ_SEG=[[0,10/33,22/33,1],[0,2/3,1],[0,1/3,1],[0,.1,.4,1]];   // each bar's bands at their true scale widths
+function fjWrap(s,n){ const out=[]; let line=''; for(const w of s.split(' ')){ if(line&&line.length+1+w.length>n){ out.push(line); line=w; } else line=line?line+' '+w:w; } return [...out,line]; }
+function fjFeed(d,f,x){
+  const t=T[L].fj, since=dayDate(days[0].k).toLocaleDateString(T[L].dateLoc,{day:'numeric',month:'short'});
+  const labels=[t.rows.salt,t.rows.clar,t.rows.alg(since),T[L].facts.dO], X0=28, W=344;
+  let o=`<svg class="fj-feed" viewBox="0 0 400 500" aria-hidden="true"><text class="fj-d" x="20" y="32">${x.date}</text><text class="fj-s" x="20" y="52">${x.sub}</text>`
+    +`<g transform="translate(8 58) scale(1.7)">${fjSym(d,f,x,false)}</g>`
+    +`<text class="fj-t num" x="196" y="142">${x.temp}</text><text class="fj-w" x="198" y="168">${x.tw}</text><text class="fj-dt" x="198" y="188">${x.delta}</text>`;
+  if(x.chip) o+=`<rect x="196" y="200" width="${Math.round(x.chip.length*6.7+22)}" height="23" rx="11.5" style="fill:var(--fg)"/><text class="fj-c" x="207" y="215.5">${x.chip}</text>`;
+  o+=`<text class="fj-h" x="20" y="258">${x.head}</text><rect x="14" y="270" width="372" height="172" rx="16" style="fill:var(--bg)"/><text class="fj-g" x="28" y="290">${t.group}</text>`;
+  labels.forEach((lab,i)=>{
+    const y=[311,344,377,416][i], b=FJ_SEG[i];
+    o+=`<text class="fj-l" x="${X0}" y="${y}">${lab}</text><text class="fj-v" x="${X0+W}" y="${y}" text-anchor="end">${x.words[i]}</text>`;
+    for(let j=0;j<b.length-1;j++){ const x0=X0+b[j]*W+(j?1.5:0), x1=X0+b[j+1]*W-(j<b.length-2?1.5:0);
+      o+=`<rect class="${j===f.band[i]?'fj-on':'fj-off'}" x="${n1(x0)}" y="${y+7}" width="${n1(x1-x0)}" height="9" rx="4.5"/>`; }
+    o+=`<circle class="fj-m" cx="${n1(X0+f.pos[i]*W)}" cy="${y+11.5}" r="5.5"/>`;
+    if(i===2) o+='<path d="M28 396H372" stroke="var(--line)" stroke-width="1.5"/>';
+  });
+  return o+fjWrap(x.foot,L==='no'?46:58).map((ln,n)=>`<text class="fj-f" x="20" y="${466+18*n}">${ln}</text>`).join('')+'</svg>';
+}
+// the grid tile keeps the bowl and the temperature only, so the month reads like a forecast's day list
+const fjTile=(d,f,x)=>`<svg class="fj-tile" viewBox="0 0 300 400" aria-hidden="true"><g transform="translate(18 6) scale(2.64)">${fjSym(d,f,x,true)}</g>`
+  +`<text class="fj-t num" x="150" y="376" text-anchor="middle" style="font-size:78px">${x.temp}</text></svg>`;
+function card(d){
+  const f=fjOf(d), x=fjText(d,f), t=T[L].fj, lc=s=>s[0].toLowerCase()+s.slice(1);
+  const aria=`${x.date}: ${x.head}${x.chip?` (${x.chip})`:''}. ${fmt(f.T10/10)} °C, ${lc(x.tw)}${x.delta?', '+lc(x.delta):''}. `
+    +(x.lid2?`${t.lidT} ${x.lid2}. `:'')
+    +`${t.rows.salt}: ${x.words[0]}. ${t.rows.clar}: ${x.words[1]}. ${t.algShort}: ${x.words[2]}. ${T[L].facts.dO}: ${x.words[3]}. ${x.sub}. ${x.foot}`;
+  // spans, not divs: the card also sits inside a <button>
+  return `<span class="post fj" data-mood="${d.mood}" role="img" aria-label="${aria}">${fjFeed(d,f,x)}${fjTile(d,f,x)}</span>`;
+}
+function sheet(d){
+  const t=T[L];
+  const rows=[[t.facts.sT,fmt(d.sT)+NB+'°C'],[t.facts.sS,fmt(d.sS)+NB+'PSU'],[t.facts.sTu,fmt(d.sTu,2)+NB+'FTU'],[t.facts.sF,fmt(d.sF,2)+NB+'µg/l'],[t.facts.dO,fmt(d.dO,0)+NB+'%']];
+  return `<span class="post sheet" data-mood="${d.mood}"><span class="sh-t">${t.sheetTitle}</span><span class="sh-d">${longDate(d.k)}</span>`
+    +rows.map(([k,v])=>`<span class="sh-r"><span>${k}</span><b class="num">${v}</b></span>`).join('')
+    +`<span class="sh-n">${t.facts.n(d.n,d===lastDay&&d.n<6)}</span></span>`;
+}
+function caption(d){
+  const p=d.prev, murky=d.sTu!=null&&d.sTu>=1;
+  const f={T:fmt(d.sT),S:fmt(d.sS),pS:p?fmt(p.sS):null,low:d.sS<10,
+    murky:murky?(p&&p.sTu!=null&&p.sTu>=1?'stayed':'turned'):null,
+    F:fmt(d.sF,2),r:d.fBase?fmt(d.sF/d.fBase,0):'–',since:dayDate(days[0].k).toLocaleDateString(T[L].dateLoc,{day:'numeric',month:'long'}),
+    dT:p?fmt(p.sT-d.sT):'–',O:fmt(d.dO,0),oxy:d.dO==null?null:d.dO<10?'very':d.dO<40?'low':null};   // the main page's oxygen thresholds
+  return T[L].cap[d.mood](f);
+}
+const tileLabel=d=>T[L].tileLabel(longDate(d.k),fmt(d.sT)+NB+'°C',fjText(d,fjOf(d)).head);
+
+// ---------- new post types and context-picked captions (draft, see docs/GABBY-NEXT.md) ----------
+const r1=v=>Math.round(v*10);   // compare at display precision
+const wd=k=>dayDate(k).toLocaleDateString(T[L].dateLoc,{weekday:'long'});
+const faceSvg=(m,cls)=>`<svg${cls?` class="${cls}"`:''} viewBox="190 285 220 220" aria-hidden="true"><use href="#art-buoy"/><g class="face">${face(m)}</g></svg>`;
+const SAL={min:0,max:33,stops:['#f0f9ff','#a5d8ff','#4dabf7','#1c7ed6','#1b3d8f','#0b1f4d']};   // the main page's salinity scale (a data colour)
+function salColor(v){
+  let x=(v-SAL.min)/(SAL.max-SAL.min); x=Math.max(0,Math.min(1,x));
+  const n=SAL.stops.length-1, i=Math.min(n-1,Math.floor(x*n)), f=x*n-i, h=s=>[1,3,5].map(k=>parseInt(s.slice(k,k+2),16)), a=h(SAL.stops[i]), b=h(SAL.stops[i+1]);
+  return `rgb(${a.map((c,k)=>Math.round(c+(b[k]-c)*f)).join(' ')})`;
+}
+function divesOf(k){ const out=[]; H.ts.forEach((t,i)=>{ if(t.startsWith(k)) out.push({h:+t.slice(11,13),t:t.slice(11,16),i,s:mean('salinity',[i],SURF)}); }); return out; }
+// how the surface changed between the day's dives, when it moved 8 PSU or more
+function swingOf(d){
+  const ds=divesOf(d.k).filter(x=>x.s!=null); if(ds.length<3) return null;
+  const r=ds.map(x=>r1(x.s)), lo=Math.min(...r), hi=Math.max(...r);
+  if(hi-lo<80) return null;
+  const v=x=>({v:fmt(x.s),t:x.t});
+  return r.every((x,i)=>!i||x<=r[i-1])?{fell:[v(ds[0]),v(ds.at(-1))]}:{swung:[v(ds[r.indexOf(hi)]),v(ds[r.indexOf(lo)])]};
+}
+function stripSvg(d){
+  const slot=Array(8).fill(null); divesOf(d.k).forEach(x=>{ slot[Math.min(7,Math.floor(x.h/3))]=x; });   // 3-hour slots, so a missing dive shows as a gap
+  const X0=20,CW=19.4,Y0=12,n=H.depths.filter(z=>z<10).length,RH=100/n,cx=c=>X0+c*CW+(CW-1.6)/2;   // the top 10 m, where the fresh layer shows
+  let s='';
+  slot.forEach((x,c)=>{
+    const x0=X0+c*CW;
+    if(!x) s+=`<rect class="gap" x="${x0+.4}" y="${Y0+.4}" width="${CW-2.4}" height="${n*RH-.8}" rx="1.5"/><text class="ax" x="${cx(c)}" y="8" text-anchor="middle">–</text>`;
+    else{
+      for(let j=0;j<n;j++){ const v=H.salinity[x.i]?.[j]; if(v!=null) s+=`<rect x="${x0}" y="${Y0+j*RH}" width="${CW-1.6}" height="${RH+.05}" fill="${salColor(v)}"/>`; }
+      s+=`<text x="${cx(c)}" y="8" text-anchor="middle">${fmt(x.s)}</text>`;
+    }
+    s+=`<text class="ax" x="${cx(c)}" y="${Y0+n*RH+7}" text-anchor="middle">${String(c*3).padStart(2,'0')}</text>`;
+  });
+  s+=`<text class="ax" x="0" y="${Y0+4}">0${NB}m</text><text class="ax" x="0" y="${Y0+n*RH-1}">10${NB}m</text>`;
+  return `<svg class="hm" viewBox="0 0 176 ${Y0+n*RH+10}" preserveAspectRatio="none" aria-hidden="true">${s}</svg>`;
+}
+const stripCover=d=>{ const t=T[L].ex, ds=divesOf(d.k).filter(x=>x.s!=null);
+  return `<span class="post ex" data-mood="${d.mood}"><span class="chip">${t.strip}</span><span class="ex-t">${longDate(d.k)}</span>${stripSvg(d)}<span class="ex-s">${t.stripLeg}</span><span class="ex-f">${t.stripFoot(fmt(ds[0].s),fmt(ds.at(-1).s))}</span>${faceSvg(d.mood,'ex-face')}</span>`; };
+// ponytail: hard-coded from data/*.csv (surface 0-2 m daily means, 2015-2026); compute it in scripts/prep_data.py next
+const REC={'2026-10-06':{rank:3,of:1705,fresher:['2016-08-10','2016-08-14']}};
+const recCover=d=>{ const t=T[L].ex, r=REC[d.k];
+  return `<span class="post ex" data-mood="${d.mood}"><svg class="deco" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${DECO[d.mood]}</svg><span class="chip">${t.top3}</span><span class="ex-s">${longDate(d.k)}</span><span class="rec-n num">${fmt(d.sS)}<small>PSU</small></span><span class="rec-l">${t.recLine(r.rank,nf(r.of))}</span>${faceSvg(d.mood,'ex-face')}</span>`; };
+function isoWeek(k){ const t=dayDate(k), u=new Date(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())), w=u.getUTCDay()||7; u.setUTCDate(u.getUTCDate()+4-w); return Math.ceil(((u-Date.UTC(u.getUTCFullYear(),0,1))/DAY+1)/7); }
+const weekOf=d=>posts.filter(x=>{ const g=(dayDate(d.k)-dayDate(x.k))/DAY; return g>=0&&g<6.5; }).reverse();   // Monday to this Sunday, oldest first
+const isRecap=d=>dayDate(d.k).getDay()===0&&weekOf(d).length===7;
+const weekCover=d=>{ const t=T[L].ex, w=weekOf(d), S=w.map(x=>x.sS);
+  return `<span class="post ex" data-mood="${d.mood}"><span class="chip">${t.weekWord}</span><span class="wk-n num">${isoWeek(d.k)}</span><span class="ex-t">${t.weekT}</span>`
+    +`<span class="wk-s">${t.weekStats(nf(w.reduce((a,x)=>a+x.n,0)),fmt(Math.min(...S)),fmt(Math.max(...S)),fmt(w[0].sT),fmt(w[6].sT))}</span>`
+    +`<span class="wk-row">${w.map(x=>`<span class="wk-d" data-mood="${x.mood}">${faceSvg(x.mood)}<i>${dayDate(x.k).toLocaleDateString(T[L].dateLoc,{weekday:'narrow'})}</i></span>`).join('')}</span></span>`; };
+const QUIZ='2026-10-14', BOT=H.depths.length-1;   // ponytail: one fixed quiz day; a Wednesday rule with rotating questions is next (docs/GABBY-NEXT.md)
+const quizVals=d=>{ const idx=byDay.get(d.k); return {deep:fmt(d.dO,0),top:fmt(mean('oxygen',idx,SURF),0),bot:fmt(mean('oxygen',idx,[BOT]),1)}; };
+const quizQ=d=>{ const t=T[L].ex, q=quizVals(d);
+  return `<span class="post ex" data-mood="${d.mood}"><span class="q-mark" aria-hidden="true">?</span><span class="chip">${t.quiz}</span><span class="ex-t">${t.quizQ}</span><span class="ex-s">${t.quizSub(d.n)}</span>`
+    +[['A',q.deep],['B',q.top],['C',q.bot]].map(([l,v])=>`<span class="q-o"><i>${l}</i>${v}${NB}%</span>`).join('')+`<span class="ex-f">${t.quizSwipe}</span></span>`; };
+const quizA=d=>{ const t=T[L].ex, q=quizVals(d);
+  return `<span class="post ex" data-mood="${d.mood}"><span class="chip">${t.answer}</span><span class="q-ans num">${t.quizA(q.bot)}</span><span class="ex-t">${t.quizWhy(q.deep,q.top)}</span>${faceSvg(d.mood,'ex-face')}</span>`; };
+// the slides of a post: the fjord picture, then an extra cover when a rule picks one, then the numbers
+function slidesOf(d){
+  const lead=d.k===QUIZ?[quizQ(d),quizA(d)]:REC[d.k]?[recCover(d)]:isRecap(d)?[weekCover(d)]:swingOf(d)?[stripCover(d)]:[];
+  return [card(d),...lead,sheet(d)];   // the fjord picture leads every post; [...lead,card(d),sheet(d)] puts the extra covers first
+}
+// captions picked from the day's context, falling back to the mood's own template
+function captionEx(d){
+  const t=T[L].ex, p=d.prev, base=caption(d), mo=posts.filter(x=>x.k<d.k&&x.k.slice(0,7)===d.k.slice(0,7));
+  if(REC[d.k]){ const r=REC[d.k], f=r.fresher.map(dayMonth); return t.recCap(fmt(d.sS),r.rank,nf(r.of),f.join(' '+t.and+' ')+' '+r.fresher[0].slice(0,4)); }
+  if(isRecap(d)){ const w=weekOf(d), lo=w.reduce((a,x)=>x.sS<a.sS?x:a), fresh=w.some(x=>x.mood==='fresh');
+    return t.weekCap(isoWeek(d.k),nf(w.reduce((a,x)=>a+x.n,0)),fresh?t.weekFresh(wd(lo.k),fmt(lo.sS),fmt(d.sS)):'',fmt(w[0].sT),fmt(d.sT)); }
+  if(d.k===QUIZ) return t.quizCap+base;
+  const sw=swingOf(d);
+  if(sw) return base+(sw.fell?t.fell(...sw.fell):t.swung(...sw.swung));
+  if(d.mood==='algae'&&p&&p.mood==='algae'){
+    let n=1; for(let x=p;x&&x.mood==='algae';x=x.prev) n++;
+    const streak=days.filter(x=>x.mood==='algae'&&x.k<=d.k&&(dayDate(d.k)-dayDate(x.k))/DAY<n-.5);
+    if(streak.every(x=>x.sF<=d.sF)) return t.algaeUp(n,fmt(d.sF,2),d.fBase?fmt(d.sF/d.fBase,0):'–',dayDate(days[0].k).toLocaleDateString(T[L].dateLoc,{day:'numeric',month:'long'}));
+    return t.algaeStill(n,fmt(d.sF,2),fmt(p.sF,2),d.sF>p.sF);
+  }
+  if(d.mood==='calm'&&p){
+    if(r1(d.sT)===r1(p.sT)) return t.calmSame(fmt(d.sT),fmt(d.sS));
+    const i=mo.filter(x=>x.mood==='calm').length%3;
+    if(i===1&&d.dO!=null&&d.dO<40) return t.calmDeep(fmt(d.sT),fmt(d.dO,0));
+    if(i===2) return t.calmDelta(fmt(d.sT),fmt(Math.abs(d.sT-p.sT)),d.sT>p.sT);
+  }
+  if(d.mood==='cold'&&p&&mo.length&&r1(d.sT)<Math.min(...mo.map(x=>r1(x.sT)))){
+    const i=mo.filter(x=>x.mood==='cold').length;
+    if(i===1) return t.coldLow(fmt(d.sT),fmt(p.sT-d.sT));
+    if(i>=2) return t.coldAgain(fmt(d.sT),fmt(p.sT-d.sT));
+  }
+  if(d.mood==='clear'){ const w=days.find(x=>Math.round((dayDate(d.k)-dayDate(x.k))/DAY)===7);
+    if(w&&Math.abs(d.sS-w.sS)>=10) return t.clearWeek(wd(w.k),fmt(w.sS),fmt(d.sS),fmt(d.sT)); }
+  return base;
+}
+function article(d,i){
+  const t=T[L], sl=slidesOf(d);
+  // only our own strings and formatted numbers go into this HTML
+  return `<article class="fp" id="p${i}" tabindex="-1" aria-label="${tileLabel(d)}">
+<div class="fph">${mini(d.mood)}<span><b class="u">${HANDLE}</b><span class="loc">${t.loc}</span></span><span class="ico" aria-hidden="true">${ICON.more}</span></div>
+<div class="car">
+<ul class="slides" tabindex="-1">${sl.map(s=>`<li class="slide">${s}</li>`).join('')}</ul>
+<button class="cnav prev" type="button" aria-label="${t.prevImg}" hidden>${ICON.back}</button>
+<button class="cnav next" type="button" aria-label="${t.nextImg}">${ICON.next}</button>
+<span class="count" aria-hidden="true">1/${sl.length}</span>
+</div>
+<div class="acts"><button class="ibtn heart" type="button" data-like="${d.k}" aria-pressed="${liked.has(d.k)}" aria-label="${t.like}">${ICON.heart}</button>
+<span class="ico" aria-hidden="true">${ICON.comment}</span><span class="ico" aria-hidden="true">${ICON.send}</span>
+<span class="dots" aria-hidden="true">${sl.map((_,j)=>`<i${j?'':' class="on"'}></i>`).join('')}</span><span class="ico save" aria-hidden="true">${ICON.save}</span></div>
+<p class="likes num">${t.likes(nf(likesOf(d)))}</p>
+<p class="cap"><b class="u">${HANDLE}</b> <span class="txt">${captionEx(d)}</span> <span class="tags">#StoreLungegårdsvann #Bergen #Gabriel</span></p>
+<p class="when"><time datetime="${d.k}">${dayMonth(d.k)}</time></p>
+</article>`;
+}
+
+// ---------- page ----------
+const grid=document.getElementById('grid'), feed=document.getElementById('feed');
+const profileView=document.getElementById('profileView'), feedView=document.getElementById('feedView');
+function renderFollow(){
+  const b=document.getElementById('follow');
+  b.textContent=following?T[L].following:T[L].follow;
+  b.classList.toggle('on',following);
+  document.getElementById('nFollowers').textContent=nf(FOLLOWERS+(following?1:0));
+  document.getElementById('bell').hidden=!following;   // the app shows the bell only on accounts you follow
+}
+function render(){
+  const t=T[L];
+  document.documentElement.lang=L==='no'?'nb':'en';
+  document.title=t.title;
+  document.querySelectorAll('[data-i]').forEach(el=>{ el.textContent=t[el.dataset.i]; });
+  document.querySelectorAll('[data-handle]').forEach(el=>{ el.textContent=HANDLE; });
+  document.getElementById('langGroup').setAttribute('aria-label',t.ariaLang);
+  ['no','en'].forEach(l=>document.getElementById('lang-'+l).setAttribute('aria-pressed',l===L));
+  document.getElementById('avatarFace').innerHTML=face(posts[0].mood);
+  document.getElementById('avatar').setAttribute('aria-label',t.avatarAria);
+  document.getElementById('nPosts').textContent=nf(posts.length);
+  document.getElementById('nFollowing').textContent=nf(FOLLOWING);
+  renderFollow();
+  document.getElementById('highlights').innerHTML=MOODS.filter(m=>posts.some(p=>p.mood===m)).map(m=>
+    `<li><button class="hlb" type="button" data-open="${posts.findIndex(p=>p.mood===m)}" aria-label="${t.hlAria(t.mood[m])}"><span class="hlc" data-mood="${m}"><svg viewBox="190 285 220 220" aria-hidden="true"><use href="#art-buoy"/><g class="face">${face(m)}</g></svg></span><span class="hll">${t.mood[m]}</span></button></li>`).join('');
+  grid.innerHTML=posts.map((d,i)=>`<li><button class="tilebtn" type="button" data-open="${i}" aria-label="${tileLabel(d)}">${slidesOf(d)[0]}${ICON.multi}</button></li>`).join('');
+  feed.innerHTML=posts.map(article).join('');
+  document.getElementById('feedBack').setAttribute('aria-label',t.feedBack);
+  ['back','cta','bioLink'].forEach(id=>{ document.getElementById(id).href='../?lang='+L; });   // keep the language across pages
+  const last=new Date(D.last.replace(' ','T'));
+  document.getElementById('foot2').textContent=t.foot2(last.toLocaleDateString(t.dateLoc,{day:'numeric',month:'long',year:'numeric'}));
+  document.getElementById('foot3').innerHTML=t.foot3;   // our own fixed string, with the font licence links
+  renderThemeBtn();
+}
+
+// ---------- open a post: the feed view, scrolled to it, like the app does ----------
+let opener=null, openerList=null, cur=0;
+history.scrollRestoration='manual';   // or the browser's restore on back undoes showProfile's scroll
+function openFeed(i,from){
+  opener=from; openerList=from.parentElement.closest('#highlights,#grid,.head'); cur=i;
+  if(feedView.hidden){ profileView.hidden=true; feedView.hidden=false; history.pushState({gabbyFeed:1},''); }
+  const a=document.getElementById('p'+i);
+  a.scrollIntoView({block:'start',behavior:'instant'});
+  a.focus({preventScroll:true});
+}
+function showProfile(){
+  feedView.hidden=true; profileView.hidden=false;
+  // a language switch re-renders the lists, so find the opener's replacement in the same list
+  const back=opener&&opener.isConnected?opener:(openerList||grid).querySelector(`[data-open="${cur}"]`);
+  back.scrollIntoView({block:'center',behavior:'instant'});
+  back.focus({preventScroll:true});
+}
+profileView.addEventListener('click',e=>{ const b=e.target.closest('[data-open]'); if(b) openFeed(+b.dataset.open,b); });
+document.getElementById('feedBack').addEventListener('click',()=>{ if(history.state&&history.state.gabbyFeed) history.back(); else showProfile(); });
+addEventListener('popstate',()=>{ if(!feedView.hidden) showProfile(); });
+document.addEventListener('keydown',e=>{   // on the document, so Escape works wherever focus is
+  if(feedView.hidden) return;
+  if(e.key==='Escape'){ document.getElementById('feedBack').click(); return; }
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey) return;   // Alt+Left is the browser's back
+  const s=(e.key==='ArrowLeft'||e.key==='ArrowRight')&&e.target.closest?.('.fp')?.querySelector('.slides');
+  if(s){ e.preventDefault(); s.scrollBy({left:(e.key==='ArrowRight'?1:-1)*s.clientWidth,behavior:smooth()}); }
+});
+document.getElementById('follow').addEventListener('click',()=>{ following=!following; renderFollow(); });
+
+// likes and carousels
+const smooth=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth';
+feed.addEventListener('click',e=>{
+  const h=e.target.closest('.heart');
+  if(h){
+    const k=h.dataset.like;
+    if(liked.has(k)) liked.delete(k); else liked.add(k);
+    h.setAttribute('aria-pressed',liked.has(k));
+    h.closest('.fp').querySelector('.likes').textContent=T[L].likes(nf(likesOf(posts.find(p=>p.k===k))));
+    return;
+  }
+  const n=e.target.closest('.cnav');
+  if(n){ const s=n.parentElement.querySelector('.slides'); s.scrollBy({left:(n.classList.contains('next')?1:-1)*s.clientWidth,behavior:smooth()}); }
+});
+feed.addEventListener('scroll',e=>{   // scroll doesn't bubble, so this listens in the capture phase
+  const s=e.target;
+  if(!s.classList||!s.classList.contains('slides')) return;
+  const i=Math.round(s.scrollLeft/s.clientWidth), last=s.children.length-1, car=s.parentElement;
+  const prev=car.querySelector('.prev'), next=car.querySelector('.next');
+  // show the other button and move focus to it before hiding the focused one, or focus falls back to <body>
+  if(i>0) prev.hidden=false;
+  if(i<last) next.hidden=false;
+  if(i===last&&document.activeElement===next) prev.focus();
+  if(i===0&&document.activeElement===prev) next.focus();
+  prev.hidden=i===0; next.hidden=i===last;
+  car.querySelector('.count').textContent=`${i+1}/${last+1}`;
+  car.closest('.fp').querySelectorAll('.dots i').forEach((dot,j)=>dot.classList.toggle('on',j===i));
+},true);
+
+// ---------- language and theme ----------
+document.getElementById('langGroup').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-lang]');
+  if(b&&b.dataset.lang!==L){ L=b.dataset.lang; try{localStorage.setItem('gabriel-lang',L);}catch(_){} render(); }
+});
+const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+const mq=window.matchMedia('(prefers-color-scheme: dark)');
+try{const s=localStorage.getItem('gabriel-theme'); if(s==='light'||s==='dark') document.documentElement.dataset.theme=s;}catch(e){}
+const effTheme=()=>document.documentElement.dataset.theme||(mq.matches?'dark':'light');
+function renderThemeBtn(){
+  const dark=effTheme()==='dark', b=document.getElementById('themebtn');
+  b.innerHTML=dark?SUN:MOON;
+  b.setAttribute('aria-label',dark?T[L].themeToLight:T[L].themeToDark);
+}
+document.getElementById('themebtn').addEventListener('click',()=>{
+  const next=effTheme()==='dark'?'light':'dark';
+  document.documentElement.dataset.theme=next;
+  try{localStorage.setItem('gabriel-theme',next);}catch(e){}
+  renderThemeBtn();
+});
+if(mq.addEventListener) mq.addEventListener('change',renderThemeBtn);
+
+render();
+</script>

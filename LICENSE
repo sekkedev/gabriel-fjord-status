@@ -1,0 +1,44 @@
+MIT License
+
+Copyright (c) 2026 sekkedev
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+The MIT licence covers the code, text and illustrations made for this project
+(the illustrations in prototype/assets/*.webp were AI-generated for it). It
+does not cover the third-party material below, which keeps its own terms:
+
+- Gabriel data (data/, prototype/data.json and the numbers on the built
+  pages). Gabriel buoy, operated by Amalie Skram VGS, UiB and Bergen Marine
+  Forskningsklynge, downloaded from Ekte data (https://ektedata.uib.no/gabriel/).
+  The data is free for everyone, but published data must be cited, and
+  Skolelab (post@skolelab.uib.no) asks to be told before Gabriel data is
+  published. Citation:
+
+    Muilwijk, M., Drange, H., Paasche, Ø. (2017). Gabriel conductivity-
+    temperature-depth (CTD), oxygen, fluorescence and turbidity data from
+    Store Lungegårdsvann in Bergen [Data set]. University of Bergen, Norway.
+
+- Fonts (prototype/assets/font-*.woff2). Raleway, Copyright 2010 The Raleway
+  Project Authors, Reserved Font Name "Raleway"; Open Sans, Copyright 2020 The
+  Open Sans Project Authors. Both under the SIL Open Font License 1.1; the
+  full texts are in prototype/assets/font-*-OFL.txt and are served at
+  /licenses/ on the site.

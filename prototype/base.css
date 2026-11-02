@@ -1,0 +1,54 @@
+/* Shared by template.html and gabby.html: scripts/build.py inlines this file where a page has the BASE_CSS placeholder. */
+/* Fonts are bundled so the page works offline. Both are variable weight, under the SIL Open Font License 1.1 (https://openfontlicense.org).
+   Raleway: Copyright 2010 The Raleway Project Authors, Reserved Font Name "Raleway". The full upstream font, only compressed to WOFF2:
+   a subset would be a Modified Version, which may not use the Reserved Font Name.
+   Open Sans: Copyright 2020 The Open Sans Project Authors. Google Fonts' latin subset (no Reserved Font Name). */
+@font-face{font-family:"Raleway";font-style:normal;font-weight:100 900;font-display:swap;src:url(__ASSET_font-raleway__) format("woff2")}
+@font-face{font-family:"Open Sans";font-style:normal;font-weight:300 800;font-display:swap;src:url(__ASSET_font-open-sans__) format("woff2")}
+/* Layout: Ekte data's look (white page, Raleway headings, light-blue cards, black pill buttons), one column that tells the story top to bottom */
+:root{
+  --bg:#ffffff; --fg:#0b0d12; --muted:#545b6b; --line:#e3e7ef;
+  --accent:#2563eb; --card:#e9f0fe; --card-2:#f4f7fc;
+  --pill:#21252b; --pill-fg:#ffffff; --blob:#d9f5ef; --blob-2:#c9d8fb;
+  --good:#0c7a54; --warn:#b45309; --bad:#c2410c; --chip:#ffffff;
+  --sky-1:#dbe8fd; --sky-2:#f3f7fe; --sea-1:#b7d1f9; --sea-2:#5b8de0; --sea-3:#183669;
+  --tint:rgb(37 99 235 / .18); --wave:#2563eb; --foam:rgb(255 255 255 / .85); --bubble:rgb(255 255 255 / .7);
+  --ground:#d5dce7; --on-sea:#ffffff; --shadow:rgb(15 23 42 / .12);
+  --layer-1:#93b7f5; --layer-2:#4f83de; --layer-3:#1c3a74; --art-rim:transparent;
+  --display:"Raleway","Segoe UI",system-ui,sans-serif;
+  --body:"Open Sans","Segoe UI",system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1117; --fg:#eef1f7; --muted:#a3abbd; --line:#262c38;
+  --accent:#7aa2ff; --card:#17213a; --card-2:#141a25;
+  --pill:#eef1f7; --pill-fg:#0e1117; --blob:#0f2a29; --blob-2:#1a2547;
+  --good:#3ccf95; --warn:#f0a447; --bad:#ff8a5c; --chip:#1d2433;
+  --sky-1:#18233a; --sky-2:#10151f; --sea-1:#21457f; --sea-2:#142c57; --sea-3:#07122a;
+  --tint:rgb(122 162 255 / .14); --wave:#7aa2ff; --foam:rgb(200 220 255 / .55); --bubble:rgb(200 220 255 / .5);
+  --ground:#252d3c; --on-sea:#eef1f7; --shadow:rgb(0 0 0 / .45);
+  --layer-1:#9db9ff; --layer-2:#5b8de0; --layer-3:#3461c0; --art-rim:rgb(220 230 255 / .45); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1117; --fg:#eef1f7; --muted:#a3abbd; --line:#262c38;
+  --accent:#7aa2ff; --card:#17213a; --card-2:#141a25;
+  --pill:#eef1f7; --pill-fg:#0e1117; --blob:#0f2a29; --blob-2:#1a2547;
+  --good:#3ccf95; --warn:#f0a447; --bad:#ff8a5c; --chip:#1d2433;
+  --sky-1:#18233a; --sky-2:#10151f; --sea-1:#21457f; --sea-2:#142c57; --sea-3:#07122a;
+  --tint:rgb(122 162 255 / .14); --wave:#7aa2ff; --foam:rgb(200 220 255 / .55); --bubble:rgb(200 220 255 / .5);
+  --ground:#252d3c; --on-sea:#eef1f7; --shadow:rgb(0 0 0 / .45);
+  --layer-1:#9db9ff; --layer-2:#5b8de0; --layer-3:#3461c0; --art-rim:rgb(220 230 255 / .45); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{overflow-x:clip;scroll-behavior:smooth}
+body{margin:0;position:relative;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:17px;line-height:1.6;overflow-x:clip;-webkit-text-size-adjust:100%}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));position:relative}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.1rem,5.2vw,3.4rem);font-weight:800}
+h2{font-size:clamp(1.45rem,3.2vw,1.95rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.defs{position:absolute;width:0;height:0;overflow:hidden}

@@ -1,0 +1,17 @@
+# Cloudflare static-assets headers, copied to dist/ by scripts/build.py.
+# Each page is one file with inline CSS/JS and data: images and fonts, and makes no requests.
+# 'self' in script-src/connect-src is only for the script Cloudflare injects from
+# /cdn-cgi/challenge-platform/ (JavaScript detections) and its callbacks.
+# ponytail: 'unsafe-inline' scripts since nothing on the page is user or third-party content;
+# switch to a build-time sha256 of the script if that ever changes.
+/*
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; style-src 'unsafe-inline'; img-src data:; font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+# Gabby is a demo of a social account; keep it out of search results.
+/gabby/*
+  X-Robots-Tag: noindex
