@@ -308,6 +308,7 @@ html{scroll-padding:56px 0 56px}   /* keeps focused things clear of the sticky t
 </div>
 
 <footer class="foot">
+  <p id="credit"></p>
   <p data-i="foot1"></p>
   <p data-i="capNote"></p>
   <p id="foot2"></p>
@@ -354,6 +355,7 @@ const T = {
     n:(n,partial)=>partial?`Bare ${n} dykk denne dagen, fordi dataene stopper her.`:`Gjennomsnitt av ${n} dykk denne dagen.`},
   capNote:"Teksten i innleggene er laget fra dagens målinger med faste maler. Neste steg er at KI formulerer den, fra de samme tallene. Gabriel måler ikke bakterier, så innleggene sier aldri om det er trygt å bade.",
   tileLabel:(d,temp,h)=>`${d}: ${temp} i overflaten, ${h}`,
+  credit:'Laget av Fredrik André. Flere prosjekter på <a href="https://sekke.dev">sekke.dev</a>.',
   foot1:"Demo laget til Hackathon Store Lungegårdsvann 2026. Ikke en offisiell side fra UiB, og ikke en ekte konto på sosiale medier. Ikke tilknyttet eller godkjent av Instagram eller Meta. Antall følgere og liker er bare til illustrasjon.",
   foot2:d=>"Data: "+CITATION+" Data til og med "+d+".",
   foot3:'Skrift: Raleway og Open Sans, under SIL Open Font License 1.1 (<a href="/licenses/font-raleway-OFL.txt">Raleway</a>, <a href="/licenses/font-open-sans-OFL.txt">Open Sans</a>). Illustrasjonene er KI-generert.',
@@ -427,6 +429,7 @@ const T = {
     n:(n,partial)=>partial?`Only ${n} dives that day, because the data stops here.`:`Average of ${n} dives that day.`},
   capNote:"The post text is generated from the day's measurements with fixed templates. The next step is AI phrasing it from the same numbers. Gabriel doesn't measure bacteria, so the posts never say whether it is safe to swim.",
   tileLabel:(d,temp,h)=>`${d}: ${temp} at the surface, ${h}`,
+  credit:'Made by Fredrik André. More projects at <a href="https://sekke.dev">sekke.dev</a>.',
   foot1:"Demo made for Hackathon Store Lungegårdsvann 2026. Not an official UiB page, and not a real social media account. Not affiliated with or endorsed by Instagram or Meta. Follower and like counts are illustrative only.",
   foot2:d=>"Data: "+CITATION+" Data up to "+d+".",
   foot3:'Fonts: Raleway and Open Sans, under the SIL Open Font License 1.1 (<a href="/licenses/font-raleway-OFL.txt">Raleway</a>, <a href="/licenses/font-open-sans-OFL.txt">Open Sans</a>). The illustrations are AI-generated.',
@@ -857,6 +860,7 @@ function render(){
   const last=new Date(D.last.replace(' ','T'));
   document.getElementById('foot2').textContent=t.foot2(last.toLocaleDateString(t.dateLoc,{day:'numeric',month:'long',year:'numeric'}));
   document.getElementById('foot3').innerHTML=t.foot3;   // our own fixed string, with the font licence links
+  document.getElementById('credit').innerHTML=t.credit;   // our own fixed string, with the sekke.dev link
   renderThemeBtn();
 }
 

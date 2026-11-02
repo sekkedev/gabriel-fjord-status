@@ -12,6 +12,13 @@
 @keyframes drift{50%{transform:translate(-24px,30px) scale(1.06)}}
 main,header,footer{position:relative;z-index:1}
 
+/* ---------- made-by line: a way back to sekke.dev for visitors who arrive from elsewhere ---------- */
+.by{position:relative;z-index:1;border-bottom:1px solid var(--line)}
+.by .wrap{padding-block:8px;font-size:.85rem}
+.by a{color:var(--muted);text-decoration:none}
+.by a b{color:var(--accent);font-weight:700}
+.by a:hover b{text-decoration:underline}
+
 /* ---------- header ---------- */
 header .wrap{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px 28px;padding-block:20px}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:1.35rem;color:var(--fg);text-decoration:none}
@@ -303,6 +310,8 @@ footer .wrap{padding-block:24px;font-size:.82rem;color:var(--muted);display:grid
 
 <div class="blobs" aria-hidden="true"><div class="blob a"></div><div class="blob b"></div></div>
 
+<div class="by"><div class="wrap"><a href="https://sekke.dev" data-i="by">Laget av Fredrik André · <b>sekke.dev →</b></a></div></div>
+
 <header><div class="wrap">
   <a class="brand" href="#top">
     <svg class="mark" viewBox="190 285 220 220" aria-hidden="true"><use href="#art-buoy"/><g class="face" data-face></g></svg>
@@ -457,6 +466,7 @@ footer .wrap{padding-block:24px;font-size:.82rem;color:var(--muted);display:grid
 </main>
 
 <footer><div class="wrap">
+  <p data-i="credit"></p>
   <p data-i="foot1"></p>
   <p id="foot2"></p>
   <p data-i="foot3"></p>
@@ -528,6 +538,8 @@ const T = {
    ["Turbiditet","FTU","Hvor grumsete vannet er. Øker etter regn når partikler og jord skylles ut."]],
   swim:"<b>Kan jeg bade?</b> Gabriel måler ikke bakterier, så den kan ikke si om vannet er trygt å bade i. Etter kraftig regn kan avrenning fra byen føre med seg bakterier, så dagene etter mye regn er mest usikre.",
   download:"Last ned data",about:"Om målingene",moreGabriel:"Mer om Gabriel",
+  by:'Laget av Fredrik André · <b>sekke.dev →</b>',
+  credit:'Laget av Fredrik André. Flere prosjekter på <a href="https://sekke.dev">sekke.dev</a>.',
   foot1:"Prototype til Hackathon Store Lungegårdsvann 2026, laget som en skisse før arrangementet. Ikke en offisiell side fra UiB.",
   foot2:d=>"Data: "+CITATION+" Data til og med "+d+".",
   foot3:'Skrift: Raleway og Open Sans, under SIL Open Font License 1.1 (<a href="/licenses/font-raleway-OFL.txt">Raleway</a>, <a href="/licenses/font-open-sans-OFL.txt">Open Sans</a>). Illustrasjonene er KI-generert.',
@@ -594,6 +606,8 @@ const T = {
    ["Turbidity","FTU","How cloudy the water is. It rises after rain, when particles and soil wash out."]],
   swim:"<b>Can I swim?</b> Gabriel doesn't measure bacteria, so it can't tell you whether the water is safe for swimming. After heavy rain, runoff from the city can carry bacteria, so the days after a lot of rain are the most uncertain.",
   download:"Download data",about:"About the measurements",moreGabriel:"More about Gabriel",
+  by:'Made by Fredrik André · <b>sekke.dev →</b>',
+  credit:'Made by Fredrik André. More projects at <a href="https://sekke.dev">sekke.dev</a>.',
   foot1:"Prototype for Hackathon Store Lungegårdsvann 2026, sketched before the event. Not an official UiB page.",
   foot2:d=>"Data: "+CITATION+" Data up to "+d+".",
   foot3:'Fonts: Raleway and Open Sans, under the SIL Open Font License 1.1 (<a href="/licenses/font-raleway-OFL.txt">Raleway</a>, <a href="/licenses/font-open-sans-OFL.txt">Open Sans</a>). The illustrations are AI-generated.',
