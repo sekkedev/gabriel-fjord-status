@@ -66,7 +66,8 @@ python scripts/prep_data.py   # CSV -> prototype/data.json
 | `docs/DATA.md` | Dataset notes, columns, quirks, what Gabriel does not measure, citation. |
 | `docs/DESIGN.md` | Page structure, style, motion, breakpoints, next steps. |
 | `CLAUDE.md` | Working notes and rules for AI coding agents in this repo. |
-| `LICENSE` | MIT for our own work, and the terms of the third-party data and fonts. |
+| `LICENSE` | The MIT licence for our own work. |
+| `NOTICE` | What the MIT licence doesn't cover: the Gabriel data and the fonts, and their terms. |
 
 `dist/` is build output and is not committed.
 
@@ -99,7 +100,7 @@ Fonts: [Raleway](https://github.com/googlefonts/raleway) (Copyright 2010 The Ral
 
 ## Licence
 
-Our own code, text and illustrations are under the MIT licence. The Gabriel data and the fonts keep their own terms; [LICENSE](LICENSE) lists them.
+Our own code, text and illustrations are under the MIT licence. The Gabriel data and the fonts keep their own terms; [NOTICE](NOTICE) lists them.
 
 ## Status
 

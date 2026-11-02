@@ -1,0 +1,22 @@
+Gabriel fjord status page: third-party notices
+
+The MIT licence covers the code, text and illustrations made for this project
+(the illustrations in prototype/assets/*.webp were AI-generated for it). It
+does not cover the third-party material below, which keeps its own terms:
+
+- Gabriel data (data/, prototype/data.json and the numbers on the built
+  pages). Gabriel buoy, operated by Amalie Skram VGS, UiB and Bergen Marine
+  Forskningsklynge, downloaded from Ekte data (https://ektedata.uib.no/gabriel/).
+  The data is free for everyone, but published data must be cited, and
+  Skolelab (post@skolelab.uib.no) asks to be told before Gabriel data is
+  published. Citation:
+
+    Muilwijk, M., Drange, H., Paasche, Ø. (2017). Gabriel conductivity-
+    temperature-depth (CTD), oxygen, fluorescence and turbidity data from
+    Store Lungegårdsvann in Bergen [Data set]. University of Bergen, Norway.
+
+- Fonts (prototype/assets/font-*.woff2). Raleway, Copyright 2010 The Raleway
+  Project Authors, Reserved Font Name "Raleway"; Open Sans, Copyright 2020 The
+  Open Sans Project Authors. Both under the SIL Open Font License 1.1; the
+  full texts are in prototype/assets/font-*-OFL.txt and are served at
+  /licenses/ on the site.
